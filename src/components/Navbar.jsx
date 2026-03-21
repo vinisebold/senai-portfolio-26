@@ -178,9 +178,9 @@ const Navbar = () => {
                       selectedCategory === cat.slug && (
                         <motion.div
                           key={cat.slug}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -20 }}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
                           transition={{ duration: 0.4, ease: [0.43, 0.13, 0.23, 0.96] }}
                           className="space-y-5 pt-1 flex-shrink-0"
                         >
