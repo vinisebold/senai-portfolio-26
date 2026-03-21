@@ -66,12 +66,12 @@ const Navbar = () => {
       {/* Fixed hamburger button */}
       <motion.button
         onClick={() => setMenuOpen(!menuOpen)}
-        className="fixed top-4 left-4 z-[100] w-16 h-16 flex flex-col items-center justify-center gap-[7px] group"
+        className="fixed top-1 left-8 z-[100] w-16 h-16 flex flex-col items-center justify-center gap-3 group"
         aria-label="Toggle menu"
       >
         {/* Top line */}
         <motion.span
-          className="w-10 h-[1px] bg-black origin-center"
+          className="w-16 h-[1px] bg-black origin-center"
           animate={menuOpen ? {
             rotate: 45,
             y: 4,
@@ -85,7 +85,7 @@ const Navbar = () => {
 
         {/* Bottom line */}
         <motion.span
-          className="w-10 h-[1px] bg-black origin-center"
+          className="w-16 h-[1px] bg-black origin-center"
           animate={menuOpen ? {
             rotate: -45,
             y: -4,
