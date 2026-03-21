@@ -168,7 +168,7 @@ export const portfolioData = [
     ]
   },
   {
-    categoria: "Linguagens e Códigos",
+    categoria: "Linguagens",
     slug: "linguagens",
     trimestres: [
       {
@@ -327,89 +327,6 @@ export const portfolioData = [
             imagens: [
               { src: "https://picsum.photos/seed/ch-t3-02-a/1200/800", alt: "Mapa de fluxos migratórios" },
               { src: "https://picsum.photos/seed/ch-t3-02-b/1200/800", alt: "Infográfico de dados" }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    categoria: "Matemática e Tecnologia",
-    slug: "matematica-tecnologia",
-    trimestres: [
-      {
-        numero: 1,
-        trabalhos: [
-          {
-            id: "mt-t1-01",
-            tema: "Algoritmos e Lógica de Programação",
-            habilidades: ["Pensamento computacional", "Pseudocódigo", "Resolução de problemas"],
-            descricao: "Introdução à lógica de programação através de desafios algorítmicos. Desenvolvemos fluxogramas e pseudocódigo para resolver problemas clássicos (ordenação, busca, cálculos iterativos), depois implementamos em JavaScript básico para validar o raciocínio lógico.",
-            imagens: [
-              { src: "https://picsum.photos/seed/mttec-t1-01-a/1200/800", alt: "Fluxograma de algoritmo" },
-              { src: "https://picsum.photos/seed/mttec-t1-01-b/1200/800", alt: "Código implementado" }
-            ]
-          },
-          {
-            id: "mt-t1-02",
-            tema: "Planilhas e Modelagem de Dados",
-            habilidades: ["Excel avançado", "Funções e fórmulas", "Visualização de dados"],
-            descricao: "Projeto de controle financeiro pessoal usando planilhas eletrônicas. Implementamos fórmulas para cálculo automático de receitas, despesas, saldo e projeções futuras. Criamos gráficos de pizza e linha para visualizar padrões de consumo ao longo de três meses fictícios.",
-            imagens: [
-              { src: "https://picsum.photos/seed/mttec-t1-02-a/1200/800", alt: "Planilha de controle" },
-              { src: "https://picsum.photos/seed/mttec-t1-02-b/1200/800", alt: "Dashboard de visualizações" },
-              { src: "https://picsum.photos/seed/mttec-t1-02-c/1200/800", alt: "Análise de padrões" }
-            ]
-          }
-        ]
-      },
-      {
-        numero: 2,
-        trabalhos: [
-          {
-            id: "mt-t2-01",
-            tema: "Desenvolvimento Web: Landing Page",
-            habilidades: ["HTML", "CSS", "Design responsivo"],
-            descricao: "Construção de uma landing page completa para projeto social fictício, aplicando princípios de HTML semântico, estilização com CSS moderno (Flexbox, Grid) e responsividade mobile-first. O projeto incluiu wireframes, escolha de paleta de cores e tipografia coerente.",
-            imagens: [
-              { src: "https://picsum.photos/seed/mttec-t2-01-a/1200/800", alt: "Wireframe inicial" },
-              { src: "https://picsum.photos/seed/mttec-t2-01-b/1200/800", alt: "Versão desktop" },
-              { src: "https://picsum.photos/seed/mttec-t2-01-c/1200/800", alt: "Versão mobile" }
-            ]
-          },
-          {
-            id: "mt-t2-02",
-            tema: "Banco de Dados e Estrutura de Informação",
-            habilidades: ["Modelagem de dados", "Relações entre tabelas", "SQL básico"],
-            descricao: "Modelagem de banco de dados para sistema de biblioteca escolar, definindo entidades (livros, alunos, empréstimos), relacionamentos e restrições. Implementamos consultas SQL básicas para busca, filtragem e relatórios, compreendendo a arquitetura de sistemas de informação.",
-            imagens: [
-              { src: "https://picsum.photos/seed/mttec-t2-02-a/1200/800", alt: "Diagrama entidade-relacionamento" }
-            ]
-          }
-        ]
-      },
-      {
-        numero: 3,
-        trabalhos: [
-          {
-            id: "mt-t3-01",
-            tema: "Aplicativo Mobile: Protótipo em Figma",
-            habilidades: ["UX/UI Design", "Prototipagem", "Fluxo de usuário"],
-            descricao: "Design completo de aplicativo mobile para organização de estudos e tarefas escolares. Criamos wireframes, protótipo de alta fidelidade no Figma com navegação interativa, definindo paleta de cores, iconografia, componentes reutilizáveis e fluxos de usuário otimizados.",
-            imagens: [
-              { src: "https://picsum.photos/seed/mttec-t3-01-a/1200/800", alt: "Telas principais do app" },
-              { src: "https://picsum.photos/seed/mttec-t3-01-b/1200/800", alt: "Sistema de design" },
-              { src: "https://picsum.photos/seed/mttec-t3-01-c/1200/800", alt: "Fluxo de navegação" }
-            ]
-          },
-          {
-            id: "mt-t3-02",
-            tema: "Internet das Coisas: Automação com Arduino",
-            habilidades: ["Programação embarcada", "Eletrônica básica", "Integração de sensores"],
-            descricao: "Montagem de sistema automatizado de irrigação usando Arduino, sensor de umidade do solo, válvula solenoide e código em C++. O projeto envolveu prototipagem, testes iterativos, calibração de sensores e documentação técnica completa do funcionamento.",
-            imagens: [
-              { src: "https://picsum.photos/seed/mttec-t3-02-a/1200/800", alt: "Circuito montado" },
-              { src: "https://picsum.photos/seed/mttec-t3-02-b/1200/800", alt: "Código do Arduino" }
             ]
           }
         ]

@@ -13,6 +13,11 @@
     letter-spacing: 0.06em;
   }
 
+  /* Prevent scroll when menu is open */
+  body.menu-open {
+    overflow: hidden;
+  }
+
   /* Remove all default border-radius globally */
   * {
     border-radius: 0 !important;
