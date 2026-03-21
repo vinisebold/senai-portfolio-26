@@ -164,7 +164,7 @@ const Navbar = () => {
                         {/* Category title - clickable but doesn't navigate */}
                         <button
                           onClick={() => setSelectedCategory(cat.slug)}
-                          className={`font-lora text-[28px] font-medium uppercase transition-opacity text-left hover:opacity-60`}
+                          className={`font-lora text-[28px] font-medium uppercase transition-opacity text-left hover:opacity-70`}
                         >
                           {cat.categoria}
                         </button>
@@ -188,10 +188,10 @@ const Navbar = () => {
                             <div key={num}>
                               <Link
                                 to={`/${cat.slug}/${num}-trimestre`}
-                                className="font-bricolage text-[15px] font-light tracking-[0.12em] uppercase opacity-60 hover:opacity-100 transition-opacity block"
+                                className="font-bricolage text-[15px] font-light uppercase opacity-90 hover:opacity-100 transition-opacity block"
                                 onClick={closeMenu}
                               >
-                                {num} TRIMESTRE
+                                |0{num}| TRIMESTRE
                               </Link>
                             </div>
                           ))}
