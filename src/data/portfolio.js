@@ -3,7 +3,7 @@
 
 export const portfolioData = [
   {
-    categoria: "Ciências da Natureza",
+    categoria: "Ciências Natureza",
     slug: "ciencias-natureza",
     trimestres: [
       {

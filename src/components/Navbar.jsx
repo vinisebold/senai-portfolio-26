@@ -25,16 +25,20 @@ const Navbar = () => {
     if (menuOpen) {
       document.body.classList.add('menu-open');
       // Set active category when menu opens
-      const activeCategory = categories.find(cat => isCategoryActive(cat.slug));
-      if (activeCategory) {
-        setSelectedCategory(activeCategory.slug);
+      if (location.pathname === '/') {
+        setSelectedCategory('home');
+      } else {
+        const activeCategory = categories.find(cat => isCategoryActive(cat.slug));
+        if (activeCategory) {
+          setSelectedCategory(activeCategory.slug);
+        }
       }
     } else {
       document.body.classList.remove('menu-open');
     }
 
     return () => document.body.classList.remove('menu-open');
-  }, [menuOpen]);
+  }, [menuOpen, location.pathname]);
 
   // Determine if a category is active based on current route
   const isCategoryActive = (slug) => location.pathname.includes(slug);
@@ -46,11 +50,15 @@ const Navbar = () => {
 
   // Calculate dot position based on selected category
   const calculateDotPosition = (slug) => {
+    // If home, position at first item (Vinícius Sebold)
+    if (slug === 'home') {
+      return 0;
+    }
     const idx = categories.findIndex(cat => cat.slug === slug);
-    // Each item has 24px gap (space-y-6) + approximately 36px height for 28px font
-    // Starting position after "Início" which is first item
-    const baseOffset = 60; // Offset after "Início" item
-    return baseOffset + (idx * 60); // 60px = gap + item height
+    // Each item has 2px gap (space-y-2) + approximately 36px height for 28px font
+    // Starting position after "Vinícius Sebold" which is first item
+    const baseOffset = 36; // Offset after "Vinícius Sebold" item
+    return baseOffset + (idx * 38); // 38px = gap + item height
   };
 
   return (
@@ -58,10 +66,8 @@ const Navbar = () => {
       {/* Fixed hamburger button */}
       <motion.button
         onClick={() => setMenuOpen(!menuOpen)}
-        className="fixed top-8 left-8 z-[100] w-14 h-14 flex flex-col items-center justify-center gap-[7px] group"
+        className="fixed top-4 left-4 z-[100] w-16 h-16 flex flex-col items-center justify-center gap-[7px] group"
         aria-label="Toggle menu"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
       >
         {/* Top line */}
         <motion.span
@@ -103,42 +109,33 @@ const Navbar = () => {
             className="fixed inset-0 bg-[#fafafa] z-[90] overflow-y-auto"
           >
             {/* Menu content container - aligned left */}
-            <div className="min-h-screen flex items-center px-16 md:px-32 lg:px-48 py-24">
+            <div className="min-h-screen flex items-start pt-32 px-20 md:px-40 lg:px-64">
               <div className="w-full max-w-6xl">
-                {/* Logo/Name */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1, duration: 0.6, ease: [0.43, 0.13, 0.23, 0.96] }}
-                  className="mb-20"
-                >
-                  <Link
-                    to="/"
-                    className="inline-block nav-link text-[13px] hover:opacity-60 transition-opacity"
-                    onClick={closeMenu}
-                  >
-                    VINÍCIUS SEBOLD
-                  </Link>
-                </motion.div>
-
                 {/* Two column layout: Categories | Trimesters */}
                 <div className="flex gap-20 md:gap-32">
                   {/* Left column: Main navigation */}
-                  <nav className="space-y-2 flex-shrink-0 relative">
-                    {/* Home link */}
+                  <nav className="space-y-2 flex-shrink-0">
+                    {/* Home link - Vinicius Sebold */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2, duration: 0.6, ease: [0.43, 0.13, 0.23, 0.96] }}
-                      className="flex items-center"
+                      className="flex items-center gap-4"
                     >
-                      <div className="w-1.5 h-1.5 flex-shrink-0" />
+                      <motion.div
+                        animate={{
+                          scale: selectedCategory === 'home' ? 1 : 0,
+                          opacity: selectedCategory === 'home' ? 1 : 0
+                        }}
+                        transition={{ duration: 0.3, ease: [0.43, 0.13, 0.23, 0.96] }}
+                        className="w-1 h-1.5 bg-black flex-shrink-0"
+                      />
                       <Link
                         to="/"
-                        className="inline-block font-lora text-[28px] tracking-[0.12em] uppercase hover:opacity-60 transition-opacity"
+                        className="inline-block font-lora text-[28px] font-medium uppercase hover:opacity-60 transition-opacity"
                         onClick={closeMenu}
                       >
-                        Início
+                        Vinícius Sebold
                       </Link>
                     </motion.div>
 
@@ -153,42 +150,26 @@ const Navbar = () => {
                           duration: 0.6,
                           ease: [0.43, 0.13, 0.23, 0.96]
                         }}
-                        className="flex items-center gap-4 relative"
+                        className="flex items-center gap-4"
                       >
-                        {/* Empty space for alignment */}
-                        <div className="w-1.5 h-1.5 flex-shrink-0" />
+                        <motion.div
+                          animate={{
+                            scale: selectedCategory === cat.slug ? 1 : 0,
+                            opacity: selectedCategory === cat.slug ? 1 : 0
+                          }}
+                          transition={{ duration: 0.3, ease: [0.43, 0.13, 0.23, 0.96] }}
+                          className="w-1 h-1.5 bg-black flex-shrink-0"
+                        />
 
                         {/* Category title - clickable but doesn't navigate */}
                         <button
                           onClick={() => setSelectedCategory(cat.slug)}
-                          className={`font-lora text-[28px] font-medium tracking-[0.12em] uppercase transition-opacity text-left ${
-                            selectedCategory === cat.slug
-                              ? 'opacity-100'
-                              : 'opacity-60 hover:opacity-100'
-                          }`}
+                          className={`font-lora text-[28px] font-medium uppercase transition-opacity text-left hover:opacity-60`}
                         >
                           {cat.categoria}
                         </button>
                       </motion.div>
                     ))}
-
-                    {/* Animated dot indicator - absolute positioned */}
-                    <AnimatePresence>
-                      {selectedCategory && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{
-                            opacity: 1,
-                            scale: 1,
-                            y: calculateDotPosition(selectedCategory)
-                          }}
-                          exit={{ opacity: 0, scale: 0 }}
-                          transition={{ duration: 0.4, ease: [0.43, 0.13, 0.23, 0.96] }}
-                          className="w-1.5 h-1.5 bg-black rounded-full absolute left-0"
-                          style={{ top: '10px' }}
-                        />
-                      )}
-                    </AnimatePresence>
                   </nav>
 
                   {/* Right column: Trimester links (only for selected category) */}
@@ -207,10 +188,10 @@ const Navbar = () => {
                             <div key={num}>
                               <Link
                                 to={`/${cat.slug}/${num}-trimestre`}
-                                className="font-lora text-[15px] font-light tracking-[0.12em] uppercase opacity-60 hover:opacity-100 transition-opacity block"
+                                className="font-bricolage text-[15px] font-light tracking-[0.12em] uppercase opacity-60 hover:opacity-100 transition-opacity block"
                                 onClick={closeMenu}
                               >
-                                {num}º TRIMESTRE
+                                {num} TRIMESTRE
                               </Link>
                             </div>
                           ))}

@@ -15,6 +15,7 @@ export default {
         'cormorant': ['"Cormorant Garamond"', 'serif'],
         'inter': ['Inter', 'sans-serif'],
         'lora': ['"Lora"', 'serif'],
+        'bricolage': ['"Bricolage Grotesque"', 'sans-serif'],
       },
       letterSpacing: {
         'editorial': '0.12em',
