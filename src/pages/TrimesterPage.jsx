@@ -32,15 +32,9 @@ const TrimesterPage = () => {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.2 }}
-      className="min-h-screen pt-14 flex"
-    >
-      {/* Left sidebar - Trimester navigation */}
-      <aside className="fixed left-8 top-48">
+    <>
+      {/* Left sidebar - Trimester navigation (no animation) */}
+      <aside className="fixed left-8 top-48 z-10">
         <div className="space-y-2">
           {[1, 2, 3].map((num) => (
             <Link
@@ -56,8 +50,14 @@ const TrimesterPage = () => {
         </div>
       </aside>
 
-      {/* Main content */}
-      <main className="flex-1">
+      {/* Main content with animation */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.2 }}
+        className="min-h-screen pt-14"
+      >
         {/* Page header */}
         <PageHeader numero={numero} categoria={category.categoria} />
 
@@ -79,8 +79,8 @@ const TrimesterPage = () => {
             )}
           </div>
         </section>
-      </main>
-    </motion.div>
+      </motion.div>
+    </>
   );
 };
 
