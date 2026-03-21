@@ -42,7 +42,7 @@ const TrimesterPage = () => {
       <PageHeader numero={numero} categoria={category.categoria} />
 
       {/* Work cards section */}
-      <section className="px-6 md:px-section pb-24">
+      <section className="px-20 md:px-40 lg:px-64 pb-24">
         <div className="max-w-6xl mx-auto">
           {trimester.trabalhos.length === 0 ? (
             // Empty state
