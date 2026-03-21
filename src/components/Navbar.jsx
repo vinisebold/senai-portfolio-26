@@ -188,7 +188,7 @@ const Navbar = () => {
                             <div key={num}>
                               <Link
                                 to={`/${cat.slug}/${num}-trimestre`}
-                                className="font-bricolage text-[15px] font-light uppercase opacity-90 hover:opacity-100 transition-opacity block"
+                                className="font-roboto text-[15px] font-light uppercase opacity-90 hover:opacity-100 transition-opacity block"
                                 onClick={closeMenu}
                               >
                                 |0{num}| TRIMESTRE

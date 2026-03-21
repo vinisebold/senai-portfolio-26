@@ -16,6 +16,7 @@ export default {
         'inter': ['Inter', 'sans-serif'],
         'lora': ['"Lora"', 'serif'],
         'bricolage': ['"Bricolage Grotesque"', 'sans-serif'],
+        'roboto': ['"Roboto"', 'sans-serif'],
       },
       letterSpacing: {
         'editorial': '0.12em',

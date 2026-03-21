@@ -17,7 +17,7 @@ const PageHeader = ({ numero, categoria }) => {
           {categoria}
         </h1>
 
-        <p className="font-bricolage text-[15px] font-light uppercase opacity-60">
+        <p className="font-roboto text-[15px] font-light uppercase opacity-60">
           {numero}º Trimestre
         </p>
       </div>
