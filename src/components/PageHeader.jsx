@@ -11,17 +11,12 @@
 const PageHeader = ({ numero, categoria }) => {
   return (
     <header className="pt-24 pb-16 px-6 md:px-section">
-      {/* Editorial number */}
-      <div className="editorial-number mb-4 opacity-20">
-        {String(numero).padStart(2, '0')}
-      </div>
-
       {/* Category and trimester */}
       <h1 className="editorial-heading mb-2">
         {categoria}
       </h1>
 
-      <p className="font-inter text-xs font-light tracking-nav uppercase opacity-60">
+      <p className="font-bricolage text-[15px] font-light uppercase opacity-60">
         {numero}º Trimestre
       </p>
     </header>

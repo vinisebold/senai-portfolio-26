@@ -36,11 +36,8 @@ const Home = () => {
 
         {/* Subtitle */}
         <p className="nav-link opacity-60 mb-16">
-          PORTFÓLIO ESCOLAR — 2024
+          PORTFÓLIO ESCOLAR — 2026
         </p>
-
-        {/* Single divider line */}
-        <div className="w-24 h-[1px] bg-black"></div>
       </section>
 
       {/* Categories section */}
@@ -63,10 +60,6 @@ const Home = () => {
                   className="group"
                 >
                   <article className="border-t border-black pt-6 transition-opacity hover:opacity-60">
-                    {/* Category number */}
-                    <div className="font-cormorant text-5xl font-light mb-4 opacity-20">
-                      {String(index + 1).padStart(2, '0')}
-                    </div>
 
                     {/* Category name */}
                     <h2 className="font-cormorant text-2xl font-normal tracking-editorial uppercase mb-3">
@@ -89,7 +82,7 @@ const Home = () => {
       <footer className="px-6 md:px-section py-12 border-t border-black">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="nav-link opacity-40">
-            © 2024 VINÍCIUS SEBOLD
+            © 2026 VINÍCIUS SEBOLD
           </p>
           <p className="nav-link opacity-40">
             SENAI — ENSINO MÉDIO
