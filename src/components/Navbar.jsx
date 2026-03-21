@@ -8,7 +8,7 @@ import { getCategories } from '../data/portfolio';
  *
  * Design principles:
  * - Two-line hamburger button (top-left) transforms into X
- * - Fullscreen overlay menu with centered content
+ * - Fullscreen overlay menu with two-column layout
  * - Ultra-minimal editorial aesthetic
  * - Smooth staggered animations
  * - Clean typography with generous spacing
@@ -16,7 +16,7 @@ import { getCategories } from '../data/portfolio';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const location = useLocation();
   const categories = getCategories();
 
@@ -24,6 +24,11 @@ const Navbar = () => {
   useEffect(() => {
     if (menuOpen) {
       document.body.classList.add('menu-open');
+      // Set active category when menu opens
+      const activeCategory = categories.find(cat => isCategoryActive(cat.slug));
+      if (activeCategory) {
+        setSelectedCategory(activeCategory.slug);
+      }
     } else {
       document.body.classList.remove('menu-open');
     }
@@ -36,7 +41,16 @@ const Navbar = () => {
 
   const closeMenu = () => {
     setMenuOpen(false);
-    setHoveredCategory(null);
+    setSelectedCategory(null);
+  };
+
+  // Calculate dot position based on selected category
+  const calculateDotPosition = (slug) => {
+    const idx = categories.findIndex(cat => cat.slug === slug);
+    // Each item has 24px gap (space-y-6) + approximately 36px height for 28px font
+    // Starting position after "Início" which is first item
+    const baseOffset = 60; // Offset after "Início" item
+    return baseOffset + (idx * 60); // 60px = gap + item height
   };
 
   return (
@@ -90,7 +104,7 @@ const Navbar = () => {
           >
             {/* Menu content container - aligned left */}
             <div className="min-h-screen flex items-center px-12 md:px-20 lg:px-32 py-24">
-              <div className="w-full max-w-4xl">
+              <div className="w-full max-w-6xl">
                 {/* Logo/Name */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -107,80 +121,106 @@ const Navbar = () => {
                   </Link>
                 </motion.div>
 
-                {/* Main navigation */}
-                <nav className="space-y-8">
-                  {/* Home link */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.6, ease: [0.43, 0.13, 0.23, 0.96] }}
-                  >
-                    <Link
-                      to="/"
-                      className="inline-block font-cormorant text-3xl md:text-4xl tracking-[0.12em] uppercase hover:opacity-60 transition-opacity"
-                      onClick={closeMenu}
-                    >
-                      Início
-                    </Link>
-                  </motion.div>
-
-                  {/* Category sections */}
-                  {categories.map((cat, idx) => (
+                {/* Two column layout: Categories | Trimesters */}
+                <div className="flex gap-20 md:gap-32">
+                  {/* Left column: Main navigation */}
+                  <nav className="space-y-6 flex-shrink-0 relative">
+                    {/* Home link */}
                     <motion.div
-                      key={cat.slug}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        delay: 0.25 + (idx * 0.08),
-                        duration: 0.6,
-                        ease: [0.43, 0.13, 0.23, 0.96]
-                      }}
-                      onMouseEnter={() => setHoveredCategory(cat.slug)}
-                      onMouseLeave={() => setHoveredCategory(null)}
+                      transition={{ delay: 0.2, duration: 0.6, ease: [0.43, 0.13, 0.23, 0.96] }}
+                      className="flex items-center gap-4"
                     >
-                      {/* Category title */}
-                      <div className="mb-3">
-                        <span className={`font-cormorant text-3xl md:text-4xl tracking-[0.12em] uppercase transition-opacity cursor-default ${
-                          hoveredCategory === cat.slug || isCategoryActive(cat.slug)
-                            ? 'opacity-100'
-                            : 'opacity-60'
-                        }`}>
-                          {cat.categoria}
-                        </span>
-                      </div>
-
-                      {/* Trimester links */}
-                      <motion.div
-                        initial={false}
-                        animate={{
-                          height: hoveredCategory === cat.slug ? 'auto' : 0,
-                          opacity: hoveredCategory === cat.slug ? 1 : 0,
-                        }}
-                        transition={{ duration: 0.3, ease: [0.43, 0.13, 0.23, 0.96] }}
-                        className="overflow-hidden"
+                      <div className="w-1.5 h-1.5 flex-shrink-0" />
+                      <Link
+                        to="/"
+                        className="inline-block font-cormorant text-[28px] tracking-[0.12em] uppercase hover:opacity-60 transition-opacity"
+                        onClick={closeMenu}
                       >
-                        <div className="flex items-center gap-6 pt-2 pl-1">
-                          {[1, 2, 3].map((num, trimIdx, arr) => (
-                            <div key={num} className="flex items-center gap-6">
+                        Início
+                      </Link>
+                    </motion.div>
+
+                    {/* Category sections */}
+                    {categories.map((cat, idx) => (
+                      <motion.div
+                        key={cat.slug}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          delay: 0.25 + (idx * 0.08),
+                          duration: 0.6,
+                          ease: [0.43, 0.13, 0.23, 0.96]
+                        }}
+                        className="flex items-center gap-4 relative"
+                      >
+                        {/* Empty space for alignment */}
+                        <div className="w-1.5 h-1.5 flex-shrink-0" />
+
+                        {/* Category title - clickable but doesn't navigate */}
+                        <button
+                          onClick={() => setSelectedCategory(cat.slug)}
+                          className={`font-cormorant text-[28px] tracking-[0.12em] uppercase transition-opacity text-left ${
+                            selectedCategory === cat.slug
+                              ? 'opacity-100'
+                              : 'opacity-60 hover:opacity-100'
+                          }`}
+                        >
+                          {cat.categoria}
+                        </button>
+                      </motion.div>
+                    ))}
+
+                    {/* Animated dot indicator - absolute positioned */}
+                    <AnimatePresence>
+                      {selectedCategory && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0 }}
+                          animate={{
+                            opacity: 1,
+                            scale: 1,
+                            y: calculateDotPosition(selectedCategory)
+                          }}
+                          exit={{ opacity: 0, scale: 0 }}
+                          transition={{ duration: 0.4, ease: [0.43, 0.13, 0.23, 0.96] }}
+                          className="w-1.5 h-1.5 bg-black rounded-full absolute left-0"
+                          style={{ top: '8px' }}
+                        />
+                      )}
+                    </AnimatePresence>
+                  </nav>
+
+                  {/* Right column: Trimester links (only for selected category) */}
+                  <AnimatePresence mode="wait">
+                    {categories.map((cat) =>
+                      selectedCategory === cat.slug && (
+                        <motion.div
+                          key={cat.slug}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          transition={{ duration: 0.4, ease: [0.43, 0.13, 0.23, 0.96] }}
+                          className="space-y-5 pt-1 flex-shrink-0"
+                        >
+                          {[1, 2, 3].map((num) => (
+                            <div key={num}>
                               <Link
                                 to={`/${cat.slug}/${num}-trimestre`}
-                                className="nav-link text-[11px] opacity-50 hover:opacity-100 transition-opacity"
+                                className="nav-link text-[18px] opacity-60 hover:opacity-100 transition-opacity block"
                                 onClick={closeMenu}
                               >
-                                {num}º TRIM
+                                {num}º TRIMESTRE
                               </Link>
-                              {trimIdx < arr.length - 1 && (
-                                <span className="text-black opacity-30 text-xs">·</span>
-                              )}
                             </div>
                           ))}
-                        </div>
-                      </motion.div>
-                    </motion.div>
-                  ))}
-                </nav>
+                        </motion.div>
+                      )
+                    )}
+                  </AnimatePresence>
+                </div>
 
-                {/* Footer info (optional decorative element) */}
+                {/* Footer info */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
