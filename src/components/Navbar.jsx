@@ -74,7 +74,7 @@ const Navbar = () => {
           className="w-16 h-[1px] bg-black origin-center"
           animate={menuOpen ? {
             rotate: 45,
-            y: 4,
+            y: 6,
             transition: { duration: 0.3, ease: [0.43, 0.13, 0.23, 0.96] }
           } : {
             rotate: 0,
@@ -88,7 +88,7 @@ const Navbar = () => {
           className="w-16 h-[1px] bg-black origin-center"
           animate={menuOpen ? {
             rotate: -45,
-            y: -4,
+            y: -6,
             transition: { duration: 0.3, ease: [0.43, 0.13, 0.23, 0.96] }
           } : {
             rotate: 0,
