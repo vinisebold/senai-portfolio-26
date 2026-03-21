@@ -103,7 +103,7 @@ const Navbar = () => {
             className="fixed inset-0 bg-[#fafafa] z-[90] overflow-y-auto"
           >
             {/* Menu content container - aligned left */}
-            <div className="min-h-screen flex items-center px-12 md:px-20 lg:px-32 py-24">
+            <div className="min-h-screen flex items-center px-16 md:px-32 lg:px-48 py-24">
               <div className="w-full max-w-6xl">
                 {/* Logo/Name */}
                 <motion.div
@@ -124,18 +124,18 @@ const Navbar = () => {
                 {/* Two column layout: Categories | Trimesters */}
                 <div className="flex gap-20 md:gap-32">
                   {/* Left column: Main navigation */}
-                  <nav className="space-y-6 flex-shrink-0 relative">
+                  <nav className="space-y-2 flex-shrink-0 relative">
                     {/* Home link */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2, duration: 0.6, ease: [0.43, 0.13, 0.23, 0.96] }}
-                      className="flex items-center gap-4"
+                      className="flex items-center"
                     >
                       <div className="w-1.5 h-1.5 flex-shrink-0" />
                       <Link
                         to="/"
-                        className="inline-block font-cormorant text-[28px] tracking-[0.12em] uppercase hover:opacity-60 transition-opacity"
+                        className="inline-block font-lora text-[28px] tracking-[0.12em] uppercase hover:opacity-60 transition-opacity"
                         onClick={closeMenu}
                       >
                         Início
@@ -161,7 +161,7 @@ const Navbar = () => {
                         {/* Category title - clickable but doesn't navigate */}
                         <button
                           onClick={() => setSelectedCategory(cat.slug)}
-                          className={`font-cormorant text-[28px] tracking-[0.12em] uppercase transition-opacity text-left ${
+                          className={`font-lora text-[28px] font-medium tracking-[0.12em] uppercase transition-opacity text-left ${
                             selectedCategory === cat.slug
                               ? 'opacity-100'
                               : 'opacity-60 hover:opacity-100'
@@ -185,7 +185,7 @@ const Navbar = () => {
                           exit={{ opacity: 0, scale: 0 }}
                           transition={{ duration: 0.4, ease: [0.43, 0.13, 0.23, 0.96] }}
                           className="w-1.5 h-1.5 bg-black rounded-full absolute left-0"
-                          style={{ top: '8px' }}
+                          style={{ top: '10px' }}
                         />
                       )}
                     </AnimatePresence>
@@ -207,7 +207,7 @@ const Navbar = () => {
                             <div key={num}>
                               <Link
                                 to={`/${cat.slug}/${num}-trimestre`}
-                                className="nav-link text-[18px] opacity-60 hover:opacity-100 transition-opacity block"
+                                className="font-lora text-[15px] font-light tracking-[0.12em] uppercase opacity-60 hover:opacity-100 transition-opacity block"
                                 onClick={closeMenu}
                               >
                                 {num}º TRIMESTRE
@@ -227,9 +227,6 @@ const Navbar = () => {
                   transition={{ delay: 0.6, duration: 0.8 }}
                   className="mt-24"
                 >
-                  <p className="label-text opacity-30">
-                    Portfolio 2026
-                  </p>
                 </motion.div>
               </div>
             </div>

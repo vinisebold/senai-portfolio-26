@@ -14,6 +14,7 @@ export default {
       fontFamily: {
         'cormorant': ['"Cormorant Garamond"', 'serif'],
         'inter': ['Inter', 'sans-serif'],
+        'lora': ['"Lora"', 'serif'],
       },
       letterSpacing: {
         'editorial': '0.12em',
