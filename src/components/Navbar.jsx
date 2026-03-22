@@ -66,7 +66,7 @@ const Navbar = () => {
       {/* Fixed hamburger button */}
       <motion.button
         onClick={() => setMenuOpen(!menuOpen)}
-        className="fixed top-1 left-6 md:left-8 z-[100] w-12 h-12 md:w-16 md:h-16 flex flex-col items-center justify-center gap-2 md:gap-3 group bg-white md:bg-transparent rounded-sm md:rounded-none"
+        className="fixed top-1 left-6 md:left-8 z-[100] w-12 h-12 md:w-16 md:h-16 flex flex-col items-center justify-center gap-2 md:gap-3 group bg-transparent md:bg-transparent"
         aria-label="Toggle menu"
       >
         {/* Top line */}
