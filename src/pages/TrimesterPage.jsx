@@ -34,8 +34,8 @@ const TrimesterPage = () => {
   return (
     <>
       {/* Left sidebar - Trimester navigation (no animation) */}
-      <aside className="fixed left-8 top-48 z-10">
-        <div className="space-y-2">
+      <aside className="fixed left-6 md:left-8 top-16 md:top-48 z-10">
+        <div className="flex flex-row md:flex-col gap-6 md:gap-2">
           {[1, 2, 3].map((num) => (
             <Link
               key={num}
