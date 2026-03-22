@@ -8,7 +8,7 @@
         "H6 - Compreender os conceitos relacionados à Física em seus diferentes ramos: Astronomia, Mecânica, Acústica, Óptica, Termologia, Calorimetria, Ondulatória, Eletricidade, Magnetismo e Física Moderna e Nuclear."
       ],
       "imagens": [
-        "assets/images/1tri/cn/Alavanca-Romana.jpg"
+        "assets/images/1tri/cn/Alavanca-Romana.webp"
       ]
     },
     {
@@ -19,8 +19,8 @@
         "H6 - Compreender os conceitos relacionados à Física em seus diferentes ramos: Astronomia, Mecânica, Acústica, Óptica, Termologia, Calorimetria, Ondulatória, Eletricidade, Magnetismo e Física Moderna e Nuclear."
       ],
       "imagens": [
-        "assets/images/1tri/cn/fisica-1.jpg",
-        "assets/images/1tri/cn/fisica-2.jpg"
+        "assets/images/1tri/cn/fisica-1.webp",
+        "assets/images/1tri/cn/fisica-2.webp"
       ]
     }
   ],
@@ -33,7 +33,7 @@
         "H23 - Formular propostas de alcance individual ou coletivo, utilizando como critérios a preservação e a promoção da saúde individual e coletiva."
       ],
       "imagens": [
-        "assets/images/2tri/cn/biocard.jpeg"
+        "assets/images/2tri/cn/biocard.webp"
       ]
     },
     {
@@ -44,7 +44,13 @@
         "H21 - Conhecer as características do sistema nervoso e seu papel na coordenação das ações motoras e sensoriais do corpo, com base na análise de suas estruturas básicas."
       ],
       "imagens": [
-        "assets/images/2tri/cn/slides/1.jpg"
+        "assets/images/2tri/cn/slides/1.webp",
+        "assets/images/2tri/cn/slides/2.webp",
+        "assets/images/2tri/cn/slides/3.webp",
+        "assets/images/2tri/cn/slides/4.webp",
+        "assets/images/2tri/cn/slides/5.webp",
+        "assets/images/2tri/cn/slides/6.webp",
+        "assets/images/2tri/cn/slides/7.webp"
       ],
       "link": "https://www.canva.com/design/DAGpei8Db_4/zqgDJNlXBh4bnM5F8CuFlQ/edit?utm_content=DAGpei8Db_4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
     },
@@ -56,7 +62,7 @@
         "H6 - Compreender os conceitos relacionados à Física em seus diferentes ramos."
       ],
       "imagens": [
-        "assets/images/2tri/cn/hidroestatica.jpg"
+        "assets/images/2tri/cn/hidroestatica.webp"
       ]
     }
   ],
@@ -70,7 +76,7 @@
         "H8 - Compreender os conceitos relacionados à Biologia nos seus diferentes ramos: Zoologia, Botânica, Ecologia e Genética."
       ],
       "imagens": [
-        "assets/images/3tri/cn/tabela-animais.png"
+        "assets/images/3tri/cn/tabela-animais.webp"
       ],
       "link": "https://docs.google.com/spreadsheets/d/1lcnkGPCtyYE9Y7KGPNhfMWx13onmf7MyDyf0M72ovDM/edit?usp=sharing"
     },
@@ -83,9 +89,9 @@
         "H9 - Explicar os conceitos de energia, matéria, vida e transformação para explicar fenômenos naturais e procedimentos tecnológicos."
       ],
       "imagens": [
-        "assets/images/3tri/cn/manganes/1.png",
-        "assets/images/3tri/cn/manganes/2.png",
-        "assets/images/3tri/cn/manganes/3.png"
+        "assets/images/3tri/cn/manganes/1.webp",
+        "assets/images/3tri/cn/manganes/2.webp",
+        "assets/images/3tri/cn/manganes/3.webp"
       ]
     },
     		{
@@ -97,7 +103,7 @@
 				"H9 - Explicar os conceitos de energia, matéria, vida e transformação para explicar fenômenos naturais e procedimentos tecnológicos."
 			],
 			"imagens": [
-				"assets/images/3tri/cn/mapa-mental-pilhas.jpg"
+				"assets/images/3tri/cn/mapa-mental-pilhas.webp"
 			]
 		}
   ]
