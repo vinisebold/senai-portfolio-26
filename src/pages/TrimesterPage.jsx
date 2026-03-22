@@ -33,6 +33,9 @@ const TrimesterPage = () => {
 
   return (
     <>
+      {/* White background bar for mobile/tablet (behind hamburger and sidebar) */}
+      <div className="fixed top-0 left-0 right-0 h-24 bg-white md:bg-transparent z-[5]" />
+
       {/* Left sidebar - Trimester navigation (no animation) */}
       <aside className="fixed left-6 md:left-8 top-16 md:top-48 z-10">
         <div className="flex flex-row md:flex-col gap-6 md:gap-2">
