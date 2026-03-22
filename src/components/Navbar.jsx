@@ -188,7 +188,9 @@ const Navbar = () => {
                             <div key={num}>
                               <Link
                                 to={`/${cat.slug}/${num}-trimestre`}
-                                className="font-roboto text-[15px] font-light uppercase opacity-90 hover:opacity-100 transition-opacity block"
+                                className={`font-roboto text-[15px] uppercase opacity-90 hover:opacity-100 transition-opacity block ${
+                                  location.pathname === `/${cat.slug}/${num}-trimestre` ? 'font-medium' : 'font-light'
+                                }`}
                                 onClick={closeMenu}
                               >
                                 |0{num}| TRIMESTRE
