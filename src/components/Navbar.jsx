@@ -172,17 +172,8 @@ const Navbar = () => {
                           transition={{ duration: 0.4, ease: [0.43, 0.13, 0.23, 0.96] }}
                           className="space-y-5 pt-1 flex-shrink-0"
                         >
-                          {[1, 2, 3].map((num, idx) => (
-                            <motion.div
-                              key={num}
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{
-                                delay: 0.1 + (idx * 0.08),
-                                duration: 0.6,
-                                ease: [0.43, 0.13, 0.23, 0.96]
-                              }}
-                            >
+                          {[1, 2, 3].map((num) => (
+                            <div key={num}>
                               <Link
                                 to={`/${cat.slug}/${num}-trimestre`}
                                 className={`font-roboto text-[15px] uppercase opacity-90 hover:opacity-100 transition-opacity block ${
@@ -192,7 +183,7 @@ const Navbar = () => {
                               >
                                 |0{num}| TRIMESTRE
                               </Link>
-                            </motion.div>
+                            </div>
                           ))}
                         </motion.div>
                       )
