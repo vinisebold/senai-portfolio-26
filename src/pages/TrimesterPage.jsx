@@ -50,17 +50,18 @@ const TrimesterPage = () => {
         </div>
       </aside>
 
+      {/* Page header (no animation) */}
+      <div className="pt-14">
+        <PageHeader numero={numero} categoria={category.categoria} />
+      </div>
+
       {/* Main content with animation */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.2 }}
-        className="min-h-screen pt-14"
       >
-        {/* Page header */}
-        <PageHeader numero={numero} categoria={category.categoria} />
-
         {/* Work cards section */}
         <section className="px-20 md:px-40 lg:px-64 pb-24">
           <div className="max-w-6xl mx-auto">
