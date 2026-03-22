@@ -1,0 +1,95 @@
+{
+	"1": [
+		{
+			"id": "ch-01",
+			"tema": "Linha do Tempo Ilustrada",
+			"descricao": "Elaborar uma linha do tempo ilustrada do Japão pós período Sakoku, produzindo uma ilustração alusiva a cada acontecimento com uma nota de rodapé explicativa.",
+			"habilidades": [
+				"H11 - Comparar diferentes processos de produção e suas implicações histórico-sociais e econômicas.",
+				"H7 - Avaliar o impacto das transformações técnicas e tecnológicas na organização dos processos produtivos do mundo do trabalho."
+			],
+			"imagens": [
+				"assets/images/1tri/ch/1.jpg",
+				"assets/images/1tri/ch/2.jpg",
+				"assets/images/1tri/ch/3.jpg",
+				"assets/images/1tri/ch/4.jpg",
+				"assets/images/1tri/ch/5.jpg",
+				"assets/images/1tri/ch/6.jpg",
+				"assets/images/1tri/ch/7.jpg",
+				"assets/images/1tri/ch/8.jpg",
+				"assets/images/1tri/ch/9.jpg",
+				"assets/images/1tri/ch/10.jpg",
+				"assets/images/1tri/ch/11.jpg",
+				"assets/images/1tri/ch/12.jpg",
+				"assets/images/1tri/ch/13.jpg",
+				"assets/images/1tri/ch/14.jpg"
+			]
+		}
+	],
+	"2": [
+		{
+			"id": "ch-02",
+			"tema": "Quadro comparativo",
+			"descricao": "Construir um quadro comparativo entre os modelos de industrialização dos países de economia retardatária: Substituição de Importações e Plataforma de exportações, após contextualização dos momentos econômicos da implantação dos modelos.",
+			"habilidades": [
+				"H15 - Reconhecer os movimentos sociais e sua representação da coletividade como elemento de transformação da realidade social, política, econômica e cultural.",
+				"H19 - Construir ações inovadoras visando a gestão de recursos, com eficiência e eficácia, para implementação de tecnologias nos processos produtivos, analisando seus efeitos para a sociedade."
+			],
+			"imagens": [
+				"assets/images/2tri/ch/Quadro-Comparativo-1.jpg",
+				"assets/images/2tri/ch/Quadro-Comparativo-2.jpg"
+			]
+		},
+		{
+			"id": "ch-03",
+			"tema": "Capitanias Hereditárias",
+			"descricao": "Reconhecer o ser humano como agente de transformação dos diversos espaços de território e os impactos de suas ações.",
+			"habilidades": [
+				"C3 - Compreender o ser humano como agente de transformação."
+			],
+			"imagens": [
+				"assets/images/2tri/ch/capitanias-hereditas/1.jpg",
+				"assets/images/2tri/ch/capitanias-hereditas/2.jpg",
+				"assets/images/2tri/ch/capitanias-hereditas/3.jpg",
+				"assets/images/2tri/ch/capitanias-hereditas/4.jpg",
+				"assets/images/2tri/ch/capitanias-hereditas/5.jpg",
+				"assets/images/2tri/ch/capitanias-hereditas/6.jpg",
+				"assets/images/2tri/ch/capitanias-hereditas/7.jpg"
+			]
+		}
+	],
+	"3": [
+		{
+			"id": "ch-04",
+			"tema": "Trabalho de construção textual e conceitual sobre o Segundo Reinado",
+			"descricao": "Analisar as transformações naturais, sociais, econômicas, culturais e políticas no atual contexto brasileiro.",
+			"habilidades": [
+				"H24 - Reconhecer o impacto das transformações naturais, sociais, econômicas, culturais e políticas no atual contexto brasileiro."
+			],
+			"imagens": [
+				"assets/images/3tri/ch/reinado/1.jpg",
+				"assets/images/3tri/ch/reinado/2.jpg",
+				"assets/images/3tri/ch/reinado/3.jpg",
+				"assets/images/3tri/ch/reinado/4.jpg"
+			]
+		},
+				{
+			"id": "ch-05",
+			"tema": "Slides: Blocos Econômicos",
+			"descricao": "Interpretar, em fontes orais, visuais, documentais, materiais, informações sobre a dinâmicas sociais ao longo do tempo.",
+			"habilidades": [
+				"C4 - Interpretar dados e informações referentes aos aspectos políticos, econômicos, sociais e culturais da sociedade contemporânea"
+			],
+			"imagens": [
+				"assets/images/3tri/ch/brics/1.jpg",
+				"assets/images/3tri/ch/brics/2.jpg",
+				"assets/images/3tri/ch/brics/3.jpg",
+				"assets/images/3tri/ch/brics/4.jpg",
+				"assets/images/3tri/ch/brics/5.jpg",
+				"assets/images/3tri/ch/brics/6.jpg",
+				"assets/images/3tri/ch/brics/7.jpg"
+			]
+		}
+	]
+}
+

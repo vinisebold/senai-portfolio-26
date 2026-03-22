@@ -1,0 +1,104 @@
+{
+  "1": [
+    {
+      "id": "cn-01",
+      "tema": "Alavanca Romana",
+      "descricao": "Montar uma alavanca romana e anexar foto como estudante.",
+      "habilidades": [
+        "H6 - Compreender os conceitos relacionados à Física em seus diferentes ramos: Astronomia, Mecânica, Acústica, Óptica, Termologia, Calorimetria, Ondulatória, Eletricidade, Magnetismo e Física Moderna e Nuclear."
+      ],
+      "imagens": [
+        "assets/images/1tri/cn/Alavanca-Romana.jpg"
+      ]
+    },
+    {
+      "id": "cn-02",
+      "tema": "Alavanca Romana - Experimento",
+      "descricao": "Registro em imagens do experimento de alavancas, destacando vantagem mecânica e torque.",
+      "habilidades": [
+        "H6 - Compreender os conceitos relacionados à Física em seus diferentes ramos: Astronomia, Mecânica, Acústica, Óptica, Termologia, Calorimetria, Ondulatória, Eletricidade, Magnetismo e Física Moderna e Nuclear."
+      ],
+      "imagens": [
+        "assets/images/1tri/cn/fisica-1.jpg",
+        "assets/images/1tri/cn/fisica-2.jpg"
+      ]
+    }
+  ],
+  "2": [
+    {
+      "id": "cn-03",
+      "tema": "Sistema circulatório",
+      "descricao": "Foto do trabalho do sistema circulatório.",
+      "habilidades": [
+        "H23 - Formular propostas de alcance individual ou coletivo, utilizando como critérios a preservação e a promoção da saúde individual e coletiva."
+      ],
+      "imagens": [
+        "assets/images/2tri/cn/biocard.jpeg"
+      ]
+    },
+    {
+      "id": "cn-04",
+      "tema": "Tecidos animais e vegetais",
+      "descricao": "Slides dos tecidos animais ou vegetais.",
+      "habilidades": [
+        "H21 - Conhecer as características do sistema nervoso e seu papel na coordenação das ações motoras e sensoriais do corpo, com base na análise de suas estruturas básicas."
+      ],
+      "imagens": [
+        "assets/images/2tri/cn/slides/1.jpg"
+      ],
+      "link": "https://www.canva.com/design/DAGpei8Db_4/zqgDJNlXBh4bnM5F8CuFlQ/edit?utm_content=DAGpei8Db_4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
+    },
+    {
+      "id": "cn-05",
+      "tema": "Hidroestática",
+      "descricao": "Estudo sobre hidroestática e suas aplicações práticas.",
+      "habilidades": [
+        "H6 - Compreender os conceitos relacionados à Física em seus diferentes ramos."
+      ],
+      "imagens": [
+        "assets/images/2tri/cn/hidroestatica.jpg"
+      ]
+    }
+  ],
+  "3": [
+    {
+      "id": "cn-06",
+      "tema": "Tabela Animais",
+      "descricao": "LINK da Tabela de Animais",
+      "habilidades": [
+        "C2 - Aplicar os conceitos fundamentais e estruturas procedimentais das Ciências da Natureza na explicação de fenômenos cotidianos, bem como dominar processos e práticas da investigação científica.",
+        "H8 - Compreender os conceitos relacionados à Biologia nos seus diferentes ramos: Zoologia, Botânica, Ecologia e Genética."
+      ],
+      "imagens": [
+        "assets/images/3tri/cn/tabela-animais.png"
+      ],
+      "link": "https://docs.google.com/spreadsheets/d/1lcnkGPCtyYE9Y7KGPNhfMWx13onmf7MyDyf0M72ovDM/edit?usp=sharing"
+    },
+    {
+      "id": "cn-07",
+      "tema": "ATIVIDADE EXPERIMENTAL: Número de Oxidação: Reação de redução do manganês.",
+      "descricao": "Fotos do Relatório e Fotos/Vídeo da atividade experimental- Número de Oxidação: Reação de redução do manganês.",
+      "habilidades": [
+        "C2 - Aplicar os conceitos fundamentais e estruturas procedimentais das Ciências da Natureza na explicação de fenômenos cotidianos, bem como dominar processos e práticas da investigação científica.",
+        "H9 - Explicar os conceitos de energia, matéria, vida e transformação para explicar fenômenos naturais e procedimentos tecnológicos."
+      ],
+      "imagens": [
+        "assets/images/3tri/cn/manganes/1.png",
+        "assets/images/3tri/cn/manganes/2.png",
+        "assets/images/3tri/cn/manganes/3.png"
+      ]
+    },
+    		{
+			"id": "cn-08",
+			"tema": "Mapa Mental PILHAS - Eletroquímica",
+			"descricao": "Construir um mapa mental sobre pilhas e eletroquímica.",
+			"habilidades": [
+				"C2 - Aplicar os conceitos fundamentais e estruturas procedimentais das Ciências da Natureza na explicação de fenômenos cotidianos, bem como dominar processos e práticas da investigação científica.",
+				"H9 - Explicar os conceitos de energia, matéria, vida e transformação para explicar fenômenos naturais e procedimentos tecnológicos."
+			],
+			"imagens": [
+				"assets/images/3tri/cn/mapa-mental-pilhas.jpg"
+			]
+		}
+  ]
+}

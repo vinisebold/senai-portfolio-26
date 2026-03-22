@@ -1,0 +1,107 @@
+{
+	"1": [
+		{
+			"id": "ling-01",
+			"tema": "Releitura da obra 'Operários' de Tarsila do Amaral",
+			"descricao": "Cada grupo deve criar uma releitura da obra Operários, refletindo uma visão contemporânea das questões sociais e laborais, incorporando elementos visuais modernos.",
+			"habilidades": [
+				"H16 - Relacionar práticas corporais e artísticas à própria vida, ao convívio social e à formação de identidades."
+			],
+			"imagens": [
+				"assets/images/1tri/ling/Operarios.png"
+			]
+		},
+		{
+			"id": "ling-02",
+			"tema": "Sistema Respiratório",
+			"descricao": "Produzir mapa mental contendo: função do sistema, órgãos do sistema com suas funções, controle da respiração e desenho dos movimentos respiratórios.",
+			"habilidades": [
+				"H10 - Construir as possibilidades e os limites das linguagens verbais, corporais e artísticas na criação e execução de projetos coletivos e ações colaborativas."
+			],
+			"imagens": [
+				"assets/images/1tri/ling/SistemaRespiratorio.png"
+			]
+		},
+		{
+			"id": "ling-03",
+			"tema": "Mapa Mental - Will x Going to",
+			"descricao": "Mapa mental com diferenças entre will e going to; formas negativas e interrogativas; exemplos e ilustrações.",
+			"habilidades": [
+				"H15 - Produzir trabalhos individuais e coletivos, explorando materiais e técnicas ligados ao universo das composições artísticas e de práticas corporais."
+			],
+			"imagens": [
+				"assets/images/1tri/ling/Will-GoingTo.png"
+			]
+		}
+	],
+	"2": [
+		{
+			"id": "ling-04",
+			"tema": "Guinness Records",
+			"descricao": "Atividade em grupo para preparar slides em inglês com recordes mundiais, utilizando superlativos e apresentação oral.",
+			"habilidades": [
+				"H15 - Produzir trabalhos individuais e coletivos, explorando materiais e técnicas artísticas."
+			],
+			"imagens": [
+				"assets/images/2tri/ling/record-of-the-dogs/1.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/2.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/3.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/4.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/5.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/6.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/7.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/8.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/9.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/10.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/11.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/12.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/13.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/14.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/15.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/16.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/17.jpg",
+				"assets/images/2tri/ling/record-of-the-dogs/18.jpg"
+			],
+			"link": "https://www.canva.com/design/DAGp9P9uNUQ/Dmxl_D5vp1exJA5PYSApCg/edit?utm_content=DAGp9P9uNUQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
+		},
+		{
+			"id": "ling-05",
+			"tema": "Paródia em quadrinhos: A linguagem visual na música",
+			"descricao": "Escrever uma paródia com figuras de linguagem e transformar em HQ com 8 a 10 quadrinhos, utilizando elementos visuais coerentes.",
+			"habilidades": [
+				"H15 - Produzir trabalhos artísticos.",
+				"HS14 - Comunicação por meio de plataformas multimídia."
+			],
+			"imagens": [
+				"assets/images/2tri/ling/HQ.png"
+			]
+		},
+		{
+			"id": "ling-06",
+			"tema": "Vida Saudável",
+			"descricao": "Escrever sua versão da música, garantindo o uso de figuras de linguagem. A paródia deve ser estruturada em pequenos trechos para facilitar a adaptação para um formato. Criar quadrinhos com imagens representando cada trecho da paródia. Utilizar folha A3, 8 a 10 quadrinhos. Incorporar balões de fala, expressões faciais e cenários que reforcem o significado das figuras de linguagem presentes no texto.",
+			"habilidades": [
+				"H15 - Produzir trabalhos individuais e coletivos, explorando materiais e técnicas ligados ao universo das composições artísticas e de práticas corporais.",
+				"HS14 - Comunicação por meio de plataformas multimídia analógicas e digitais, com conhecimento de meios diversos, como áudio, textos, imagens, gráficos e linguagens verbais, artísticas, científicas, matemáticas, cartográficas, corporais e multimodais, em diferentes contextos buscando adequação ao interlocutor."
+			],
+			"imagens": [
+				"assets/images/2tri/ling/1000056080.jpg"
+			]
+		}
+	],
+	"3": [
+		{
+			"id": "ling-07",
+			"tema": "Poster - Health and Medicine",
+			"descricao": "Criar um pôster em inglês destacando avanços na saúde e medicina.",
+			"habilidades": [
+				"C4 - Produzir textos orais e escritos, utilizando-os como meio de acesso e permanência no mundo do trabalho, respondendo aos diferentes propósitos da comunicação.",
+				"H24 - Produzir textos escritos de domínio acadêmico e educacional."
+			],
+			"imagens": [
+				"assets/images/3tri/ling/health-medicine.jpg"
+			]
+		}
+	]
+}
+
