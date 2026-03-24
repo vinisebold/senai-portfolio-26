@@ -44,7 +44,7 @@ const YearSwitch = ({ size = 'large', className = '' }) => {
   const targetSlots =
     hoveredYear === firstYear ? [0, 1] : hoveredYear === secondYear ? [1, 2] : [0, 2];
 
-  const yearClassName = `${currentSize.year} transition-opacity duration-300 hover:opacity-60`;
+  const yearClassName = `${currentSize.year}`;
 
   if (!firstYear || !secondYear) {
     return (
@@ -72,7 +72,7 @@ const YearSwitch = ({ size = 'large', className = '' }) => {
         className={currentSize.bar}
         style={{ position: 'absolute', left: 0, pointerEvents: 'none' }}
         animate={{ x: slotPositions[targetSlots[0]] }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       >
         |
       </motion.span>
@@ -110,7 +110,7 @@ const YearSwitch = ({ size = 'large', className = '' }) => {
         className={currentSize.bar}
         style={{ position: 'absolute', left: 0, pointerEvents: 'none' }}
         animate={{ x: slotPositions[targetSlots[1]] }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       >
         |
       </motion.span>
