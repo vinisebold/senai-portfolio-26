@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import TrimesterPage from './pages/TrimesterPage';
 import YearSelector from './pages/YearSelector';
+import AdminPage from './pages/AdminPage';
 
 /**
  * AnimatedRoutes - Wrapper for page transitions
@@ -16,6 +17,7 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<YearSelector />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="/:year" element={<Home />} />
         <Route path="/:year/:categorySlug/:trimesterNumber" element={<TrimesterPage />} />
       </Routes>

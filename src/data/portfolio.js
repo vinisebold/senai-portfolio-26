@@ -1,11 +1,7 @@
-import cienciasHumanas2025 from '../../assets/data/2025/ciencias-humanas.json';
-import cienciasNatureza2025 from '../../assets/data/2025/ciencias-natureza.json';
-import linguagens2025 from '../../assets/data/2025/linguagens.json';
-import matematica2025 from '../../assets/data/2025/matematica.json';
-import cienciasHumanas2026 from '../../assets/data/2026/ciencias-humanas.json';
-import cienciasNatureza2026 from '../../assets/data/2026/ciencias-natureza.json';
-import linguagens2026 from '../../assets/data/2026/linguagens.json';
-import matematica2026 from '../../assets/data/2026/matematica.json';
+const dataModules = import.meta.glob('../../assets/data/*/*.json', {
+  eager: true,
+  import: 'default',
+});
 
 const imageModules = import.meta.glob('../../assets/images/**/*.{webp,png,jpg,jpeg,avif}', {
   eager: true,
@@ -37,20 +33,18 @@ const emptyYearTemplate = {
   '3': [],
 };
 
-const yearlyRawData = {
-  '2025': {
-    'ciencias-humanas': cienciasHumanas2025,
-    'ciencias-natureza': cienciasNatureza2025,
-    linguagens: linguagens2025,
-    matematica: matematica2025,
-  },
-  '2026': {
-    'ciencias-humanas': cienciasHumanas2026,
-    'ciencias-natureza': cienciasNatureza2026,
-    linguagens: linguagens2026,
-    matematica: matematica2026,
-  },
-};
+const yearlyRawData = Object.entries(dataModules).reduce((acc, [path, content]) => {
+  const match = path.match(/\/assets\/data\/(\d{4})\/([^/]+)\.json$/);
+  if (!match) return acc;
+
+  const [, year, categorySlug] = match;
+  if (!acc[year]) {
+    acc[year] = {};
+  }
+
+  acc[year][categorySlug] = content;
+  return acc;
+}, {});
 
 const resolveImageSrc = (imagePath) => {
   const key = `../../${imagePath}`;
@@ -85,12 +79,16 @@ const createPortfolioForYear = (year) =>
   }));
 
 const portfolioByYear = Object.fromEntries(
-  Object.keys(yearlyRawData).map((year) => [year, createPortfolioForYear(year)]),
+  Object.keys(yearlyRawData)
+    .sort((a, b) => Number(a) - Number(b))
+    .map((year) => [year, createPortfolioForYear(year)]),
 );
 
-export const portfolioData = portfolioByYear['2025'];
+export const portfolioData =
+  portfolioByYear[getAvailableYears()[0]] || [];
 
-export const getAvailableYears = () => Object.keys(portfolioByYear);
+export const getAvailableYears = () =>
+  Object.keys(portfolioByYear).sort((a, b) => Number(a) - Number(b));
 
 export const isValidYear = (year) => Boolean(portfolioByYear[year]);
 
