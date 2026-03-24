@@ -2,10 +2,10 @@
   "1": [
     {
       "id": "mat-01",
-      "tema": "MediÃ§Ã£o de pH: ImportÃ¢ncia e Uso do pHmetro",
-      "descricao": "SoluÃ§Ãµes quÃ­micas de diferentes pH, indicadores de pH (papel tornassol ou soluÃ§Ã£o de fenolftaleÃ­na), calculadoras, tabela de pH de substÃ¢ncia do cotidiano.",
+      "tema": "MediÃÂ§ÃÂ£o de pH: ImportÃÂ¢ncia e Uso do pHmetro",
+      "descricao": "SoluÃÂ§ÃÂµes quÃÂ­micas de diferentes pH, indicadores de pH (papel tornassol ou soluÃÂ§ÃÂ£o de fenolftaleÃÂ­na), calculadoras, tabela de pH de substÃÂ¢ncia do cotidiano.",
       "habilidades": [
-        "EM13MAT305 - Resolver e elaborar problemas com funÃ§Ãµes logarÃ­tmicas nos quais seja necessÃ¡rio compreender e interpretar a variaÃ§Ã£o das grandezas envolvidas, em contextos como os de abalos sÃ­smicos, pH, radioatividade, MatemÃ¡tica Financeira, entre outros."
+        "EM13MAT305 - Resolver e elaborar problemas com funÃÂ§ÃÂµes logarÃÂ­tmicas nos quais seja necessÃÂ¡rio compreender e interpretar a variaÃÂ§ÃÂ£o das grandezas envolvidas, em contextos como os de abalos sÃÂ­smicos, pH, radioatividade, MatemÃÂ¡tica Financeira, entre outros."
       ],
       "imagens": [
         "assets/images/2025/1tri/mat/ph.webp"
@@ -14,10 +14,10 @@
     },
     {
       "id": "mat-02",
-      "tema": "Logaritmo e DecibelÃ­metro",
-      "descricao": "ExploraÃ§Ã£o de logaritmos aplicados Ã  escala de decibÃ©is e resoluÃ§Ã£o de problemas relacionados.",
+      "tema": "Logaritmo e DecibelÃÂ­metro",
+      "descricao": "ExploraÃÂ§ÃÂ£o de logaritmos aplicados ÃÂ  escala de decibÃÂ©is e resoluÃÂ§ÃÂ£o de problemas relacionados.",
       "habilidades": [
-        "H13 - Compreender e utilizar logaritmos em questÃµes tecnolÃ³gicas e em outras ciÃªncias, para expressar grandezas cujo intervalo de variaÃ§Ã£o Ã© exponencial."
+        "H13 - Compreender e utilizar logaritmos em questÃÂµes tecnolÃÂ³gicas e em outras ciÃÂªncias, para expressar grandezas cujo intervalo de variaÃÂ§ÃÂ£o ÃÂ© exponencial."
       ],
       "imagens": [
         "assets/images/2025/1tri/mat/Logaritimo-Decibelimetro.webp"
@@ -29,9 +29,9 @@
     {
       "id": "mat-03",
       "tema": "Trilha de Aprendizagem (Plurall)",
-      "descricao": "Acessar a trilha de aprendizagem da disciplina na plataforma Plurall. Copiar todas as questÃµes da trilha no caderno, com letra legÃ­vel, respeitando a numeraÃ§Ã£o original. Resolver todas as questÃµes com atenÃ§Ã£o, mostrando os cÃ¡lculos, justificativas e respostas completas. Tirar uma foto nÃ­tida da atividade pronta no caderno e inserir no portfÃ³lio.",
+      "descricao": "Acessar a trilha de aprendizagem da disciplina na plataforma Plurall. Copiar todas as questÃÂµes da trilha no caderno, com letra legÃÂ­vel, respeitando a numeraÃÂ§ÃÂ£o original. Resolver todas as questÃÂµes com atenÃÂ§ÃÂ£o, mostrando os cÃÂ¡lculos, justificativas e respostas completas. Tirar uma foto nÃÂ­tida da atividade pronta no caderno e inserir no portfÃÂ³lio.",
       "habilidades": [
-        "H17 - Utilizar conceitos bÃ¡sicos de matemÃ¡tica financeira para compreensÃ£o, resoluÃ§Ã£o, elaboraÃ§Ã£o e anÃ¡lise de situaÃ§Ãµes-problemas do cotidiano."
+        "H17 - Utilizar conceitos bÃÂ¡sicos de matemÃÂ¡tica financeira para compreensÃÂ£o, resoluÃÂ§ÃÂ£o, elaboraÃÂ§ÃÂ£o e anÃÂ¡lise de situaÃÂ§ÃÂµes-problemas do cotidiano."
       ],
       "imagens": [
         "assets/images/2025/2tri/mat/aline2.webp"
@@ -39,10 +39,10 @@
     },
     {
       "id": "mat-04",
-      "tema": "Desenhando o Mundo com Ãngulos - Criando Cenas com IA e Trigonometria",
-      "descricao": "Pensar em uma cena realista que envolva um triÃ¢ngulo retÃ¢ngulo (ex: alpinista subindo uma montanha, bombeiro em uma escada, menino empinando pipa, drone voando com Ã¢ngulo de elevaÃ§Ã£o, sombra de uma Ã¡rvore ao entardecer). Criar a descriÃ§Ã£o da cena com detalhes e usar IA para gerar a imagem ilustrativa.",
+      "tema": "Desenhando o Mundo com ÃÂngulos - Criando Cenas com IA e Trigonometria",
+      "descricao": "Pensar em uma cena realista que envolva um triÃÂ¢ngulo retÃÂ¢ngulo (ex: alpinista subindo uma montanha, bombeiro em uma escada, menino empinando pipa, drone voando com ÃÂ¢ngulo de elevaÃÂ§ÃÂ£o, sombra de uma ÃÂ¡rvore ao entardecer). Criar a descriÃÂ§ÃÂ£o da cena com detalhes e usar IA para gerar a imagem ilustrativa.",
       "habilidades": [
-        "H19 - Utilizar formas geomÃ©tricas espaciais para representar ou visualizar partes do mundo real, como peÃ§as mecÃ¢nicas, embalagens e construÃ§Ãµes."
+        "H19 - Utilizar formas geomÃÂ©tricas espaciais para representar ou visualizar partes do mundo real, como peÃÂ§as mecÃÂ¢nicas, embalagens e construÃÂ§ÃÂµes."
       ],
       "imagens": [
         "assets/images/2025/2tri/mat/aline1.webp"
@@ -52,10 +52,10 @@
   "3": [
     {
       "id": "mat-05",
-      "tema": "Construindo Minha Tabela TrigonomÃ©trica",
-      "descricao": "Nesta atividade, os estudantes deverÃ£o construir a tabela trigonomÃ©trica a partir de valores fornecidos de cateto oposto, cateto adjacente e hipotenusa, explorando na prÃ¡tica as razÃµes trigonomÃ©tricas seno, cosseno e tangente. Cada aluno deverÃ¡ calcular os valores correspondentes, organizar os resultados em uma tabela criada manualmente, e desenhar a tabela na folha entregue pela professora, caprichando na apresentaÃ§Ã£o e na clareza das informaÃ§Ãµes. ApÃ³s finalizar, deverÃ£o colar a folha no caderno e tirar uma foto do trabalho concluÃ­do, anexando-a posteriormente ao portfÃ³lio da disciplina, como registro do desenvolvimento e compreensÃ£o do conteÃºdo de trigonometria.",
+      "tema": "Construindo Minha Tabela TrigonomÃÂ©trica",
+      "descricao": "Nesta atividade, os estudantes deverÃÂ£o construir a tabela trigonomÃÂ©trica a partir de valores fornecidos de cateto oposto, cateto adjacente e hipotenusa, explorando na prÃÂ¡tica as razÃÂµes trigonomÃÂ©tricas seno, cosseno e tangente. Cada aluno deverÃÂ¡ calcular os valores correspondentes, organizar os resultados em uma tabela criada manualmente, e desenhar a tabela na folha entregue pela professora, caprichando na apresentaÃÂ§ÃÂ£o e na clareza das informaÃÂ§ÃÂµes. ApÃÂ³s finalizar, deverÃÂ£o colar a folha no caderno e tirar uma foto do trabalho concluÃÂ­do, anexando-a posteriormente ao portfÃÂ³lio da disciplina, como registro do desenvolvimento e compreensÃÂ£o do conteÃÂºdo de trigonometria.",
       "habilidades": [
-        "H18 - Identificar representaÃ§Ãµes geomÃ©tricas, planas e espaciais, para leitura, compreensÃ£o e aÃ§Ã£o sobre a realidade."
+        "H18 - Identificar representaÃÂ§ÃÂµes geomÃÂ©tricas, planas e espaciais, para leitura, compreensÃÂ£o e aÃÂ§ÃÂ£o sobre a realidade."
       ],
       "imagens": [
         "assets/images/2025/3tri/mat/1.webp",
