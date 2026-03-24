@@ -1,67 +1,66 @@
 {
-	"1": [
-		{
-			"id": "mat-01",
-			"tema": "Medição de pH: Importância e Uso do pHmetro",
-			"descricao": "Soluções químicas de diferentes pH, indicadores de pH (papel tornassol ou solução de fenolftaleína), calculadoras, tabela de pH de substância do cotidiano.",
-			"habilidades": [
-				"EM13MAT305 - Resolver e elaborar problemas com funções logarítmicas nos quais seja necessário compreender e interpretar a variação das grandezas envolvidas, em contextos como os de abalos sísmicos, pH, radioatividade, Matemática Financeira, entre outros."
-			],
-			"imagens": [
-				"assets/images/2025/1tri/mat/ph.webp"
-			],
-			"link": "https://www.canva.com/design/DAGje6xIE_8/3GHpJYi_q_lVZc8HG1vkCg/edit?utm_content=DAGje6xIE_8&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
-		},
-		{
-			"id": "mat-02",
-			"tema": "Logaritmo e Decibelímetro",
-			"descricao": "Exploração de logaritmos aplicados à escala de decibéis e resolução de problemas relacionados.",
-			"habilidades": [
-				"H13 - Compreender e utilizar logaritmos em questões tecnológicas e em outras ciências, para expressar grandezas cujo intervalo de variação é exponencial."
-			],
-			"imagens": [
-				"assets/images/2025/1tri/mat/Logaritimo-Decibelimetro.webp"
-			],
-			"link": "https://drive.google.com/file/d/1l5pwGs7c70XbR95pD89qURNZHLD8_8a1/view?usp=sharing"
-		}
-	],
-	"2": [
-		{
-			"id": "mat-03",
-			"tema": "Trilha de Aprendizagem (Plurall)",
-			"descricao": "Acessar a trilha de aprendizagem da disciplina na plataforma Plurall. Copiar todas as questões da trilha no caderno, com letra legível, respeitando a numeração original. Resolver todas as questões com atenção, mostrando os cálculos, justificativas e respostas completas. Tirar uma foto nítida da atividade pronta no caderno e inserir no portfólio.",
-			"habilidades": [
-				"H17 - Utilizar conceitos básicos de matemática financeira para compreensão, resolução, elaboração e análise de situações-problemas do cotidiano."
-			],
-			"imagens": [
-				"assets/images/2025/2tri/mat/aline2.webp"
-			]
-		},
-		{
-			"id": "mat-04",
-			"tema": "Desenhando o Mundo com Ângulos - Criando Cenas com IA e Trigonometria",
-			"descricao": "Pensar em uma cena realista que envolva um triângulo retângulo (ex: alpinista subindo uma montanha, bombeiro em uma escada, menino empinando pipa, drone voando com ângulo de elevação, sombra de uma árvore ao entardecer). Criar a descrição da cena com detalhes e usar IA para gerar a imagem ilustrativa.",
-			"habilidades": [
-				"H19 - Utilizar formas geométricas espaciais para representar ou visualizar partes do mundo real, como peças mecânicas, embalagens e construções."
-			],
-			"imagens": [
-				"assets/images/2025/2tri/mat/aline1.webp"
-			]
-		}
-	],
-	"3": [
-		{
-			"id": "mat-05",
-			"tema": "Construindo Minha Tabela Trigonométrica",
-			"descricao": "Nesta atividade, os estudantes deverão construir a tabela trigonométrica a partir de valores fornecidos de cateto oposto, cateto adjacente e hipotenusa, explorando na prática as razões trigonométricas seno, cosseno e tangente. Cada aluno deverá calcular os valores correspondentes, organizar os resultados em uma tabela criada manualmente, e desenhar a tabela na folha entregue pela professora, caprichando na apresentação e na clareza das informações. Após finalizar, deverão colar a folha no caderno e tirar uma foto do trabalho concluído, anexando-a posteriormente ao portfólio da disciplina, como registro do desenvolvimento e compreensão do conteúdo de trigonometria.",
-			"habilidades": [
-				"H18 - Identificar representações geométricas, planas e espaciais, para leitura, compreensão e ação sobre a realidade."
-			],
-			"imagens": [
-				"assets/images/2025/3tri/mat/1.webp",
-				"assets/images/2025/3tri/mat/2.webp"
-			]
-		}
-	]
+  "1": [
+    {
+      "id": "mat-01",
+      "tema": "MediÃ§Ã£o de pH: ImportÃ¢ncia e Uso do pHmetro",
+      "descricao": "SoluÃ§Ãµes quÃ­micas de diferentes pH, indicadores de pH (papel tornassol ou soluÃ§Ã£o de fenolftaleÃ­na), calculadoras, tabela de pH de substÃ¢ncia do cotidiano.",
+      "habilidades": [
+        "EM13MAT305 - Resolver e elaborar problemas com funÃ§Ãµes logarÃ­tmicas nos quais seja necessÃ¡rio compreender e interpretar a variaÃ§Ã£o das grandezas envolvidas, em contextos como os de abalos sÃ­smicos, pH, radioatividade, MatemÃ¡tica Financeira, entre outros."
+      ],
+      "imagens": [
+        "assets/images/2025/1tri/mat/ph.webp"
+      ],
+      "link": "https://www.canva.com/design/DAGje6xIE_8/3GHpJYi_q_lVZc8HG1vkCg/edit?utm_content=DAGje6xIE_8&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
+    },
+    {
+      "id": "mat-02",
+      "tema": "Logaritmo e DecibelÃ­metro",
+      "descricao": "ExploraÃ§Ã£o de logaritmos aplicados Ã  escala de decibÃ©is e resoluÃ§Ã£o de problemas relacionados.",
+      "habilidades": [
+        "H13 - Compreender e utilizar logaritmos em questÃµes tecnolÃ³gicas e em outras ciÃªncias, para expressar grandezas cujo intervalo de variaÃ§Ã£o Ã© exponencial."
+      ],
+      "imagens": [
+        "assets/images/2025/1tri/mat/Logaritimo-Decibelimetro.webp"
+      ],
+      "link": "https://drive.google.com/file/d/1l5pwGs7c70XbR95pD89qURNZHLD8_8a1/view?usp=sharing"
+    }
+  ],
+  "2": [
+    {
+      "id": "mat-03",
+      "tema": "Trilha de Aprendizagem (Plurall)",
+      "descricao": "Acessar a trilha de aprendizagem da disciplina na plataforma Plurall. Copiar todas as questÃµes da trilha no caderno, com letra legÃ­vel, respeitando a numeraÃ§Ã£o original. Resolver todas as questÃµes com atenÃ§Ã£o, mostrando os cÃ¡lculos, justificativas e respostas completas. Tirar uma foto nÃ­tida da atividade pronta no caderno e inserir no portfÃ³lio.",
+      "habilidades": [
+        "H17 - Utilizar conceitos bÃ¡sicos de matemÃ¡tica financeira para compreensÃ£o, resoluÃ§Ã£o, elaboraÃ§Ã£o e anÃ¡lise de situaÃ§Ãµes-problemas do cotidiano."
+      ],
+      "imagens": [
+        "assets/images/2025/2tri/mat/aline2.webp"
+      ]
+    },
+    {
+      "id": "mat-04",
+      "tema": "Desenhando o Mundo com Ãngulos - Criando Cenas com IA e Trigonometria",
+      "descricao": "Pensar em uma cena realista que envolva um triÃ¢ngulo retÃ¢ngulo (ex: alpinista subindo uma montanha, bombeiro em uma escada, menino empinando pipa, drone voando com Ã¢ngulo de elevaÃ§Ã£o, sombra de uma Ã¡rvore ao entardecer). Criar a descriÃ§Ã£o da cena com detalhes e usar IA para gerar a imagem ilustrativa.",
+      "habilidades": [
+        "H19 - Utilizar formas geomÃ©tricas espaciais para representar ou visualizar partes do mundo real, como peÃ§as mecÃ¢nicas, embalagens e construÃ§Ãµes."
+      ],
+      "imagens": [
+        "assets/images/2025/2tri/mat/aline1.webp"
+      ]
+    }
+  ],
+  "3": [
+    {
+      "id": "mat-05",
+      "tema": "Construindo Minha Tabela TrigonomÃ©trica",
+      "descricao": "Nesta atividade, os estudantes deverÃ£o construir a tabela trigonomÃ©trica a partir de valores fornecidos de cateto oposto, cateto adjacente e hipotenusa, explorando na prÃ¡tica as razÃµes trigonomÃ©tricas seno, cosseno e tangente. Cada aluno deverÃ¡ calcular os valores correspondentes, organizar os resultados em uma tabela criada manualmente, e desenhar a tabela na folha entregue pela professora, caprichando na apresentaÃ§Ã£o e na clareza das informaÃ§Ãµes. ApÃ³s finalizar, deverÃ£o colar a folha no caderno e tirar uma foto do trabalho concluÃ­do, anexando-a posteriormente ao portfÃ³lio da disciplina, como registro do desenvolvimento e compreensÃ£o do conteÃºdo de trigonometria.",
+      "habilidades": [
+        "H18 - Identificar representaÃ§Ãµes geomÃ©tricas, planas e espaciais, para leitura, compreensÃ£o e aÃ§Ã£o sobre a realidade."
+      ],
+      "imagens": [
+        "assets/images/2025/3tri/mat/1.webp",
+        "assets/images/2025/3tri/mat/2.webp"
+      ]
+    }
+  ]
 }
-
