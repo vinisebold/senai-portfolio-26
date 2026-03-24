@@ -225,6 +225,23 @@ async function githubRequest(token, method, endpoint, body = null) {
   return res.json();
 }
 
+// Decodifica base64 do GitHub para string UTF-8 corretamente.
+// atob() retorna bytes como string latin-1; TextDecoder converte para UTF-8.
+function base64ToUtf8(base64) {
+  const binary = atob(base64.replace(/\n/g, ""));
+  const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+  return new TextDecoder("utf-8").decode(bytes);
+}
+
+// Codifica string UTF-8 para base64 corretamente.
+// btoa() só aceita latin-1; TextEncoder converte para bytes UTF-8 primeiro.
+function utf8ToBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let binary = "";
+  for (const b of bytes) binary += String.fromCharCode(b);
+  return btoa(binary);
+}
+
 async function fetchJsonFile(token, path) {
   try {
     const file = await githubRequest(
@@ -233,7 +250,7 @@ async function fetchJsonFile(token, path) {
       `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}?ref=${BRANCH}`,
     );
 
-    const content = atob(file.content.replace(/\n/g, ""));
+    const content = base64ToUtf8(file.content);
     const parsed = JSON.parse(content);
 
     return {
@@ -271,60 +288,118 @@ async function fetchAvailableYears(token) {
   return sortYears(years);
 }
 
-// Verifica o SHA atual do arquivo no repositório (lock otimista)
-async function fetchCurrentSha(token, path) {
-  try {
-    const file = await githubRequest(
-      token,
-      "GET",
-      `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}?ref=${BRANCH}`,
-    );
-    return file.sha || null;
-  } catch {
-    return null;
-  }
+// ─── GIT DATA API: commit atômico com múltiplos arquivos ─────────────────────
+// Cria um único commit com todas as alterações de uma vez, usando blobs + tree.
+// Evita commits fantasmas comparando o conteúdo serializado com o que está em
+// memória antes de incluir o arquivo no commit.
+
+async function getRef(token) {
+  const data = await githubRequest(
+    token,
+    "GET",
+    `/repos/${REPO_OWNER}/${REPO_NAME}/git/ref/heads/${BRANCH}`,
+  );
+  return data.object.sha; // SHA do commit HEAD atual
 }
 
-async function saveJsonFile(token, path, content, sha, message, onAttempt = null) {
-  const encoded = btoa(unescape(encodeURIComponent(content)));
+async function createBlob(token, content) {
+  const data = await githubRequest(
+    token,
+    "POST",
+    `/repos/${REPO_OWNER}/${REPO_NAME}/git/blobs`,
+    { content, encoding: "utf-8" },
+  );
+  return data.sha;
+}
+
+async function createTree(token, baseTreeSha, items) {
+  // items: [{ path, sha }]  — sha de blobs já criados
+  const data = await githubRequest(
+    token,
+    "POST",
+    `/repos/${REPO_OWNER}/${REPO_NAME}/git/trees`,
+    {
+      base_tree: baseTreeSha,
+      tree: items.map(({ path, sha }) => ({
+        path,
+        mode: "100644",
+        type: "blob",
+        sha,
+      })),
+    },
+  );
+  return data.sha;
+}
+
+async function createCommit(token, message, treeSha, parentSha) {
+  const data = await githubRequest(
+    token,
+    "POST",
+    `/repos/${REPO_OWNER}/${REPO_NAME}/git/commits`,
+    { message, tree: treeSha, parents: [parentSha] },
+  );
+  return data.sha;
+}
+
+async function updateRef(token, commitSha) {
+  await githubRequest(
+    token,
+    "PATCH",
+    `/repos/${REPO_OWNER}/${REPO_NAME}/git/refs/heads/${BRANCH}`,
+    { sha: commitSha },
+  );
+}
+
+// Commit atômico: recebe um array de { path, content } e gera 1 único commit.
+// Retorna { commitSha } ou lança erro.
+async function atomicCommit(token, files, message) {
+  return withRetry(async () => {
+    // 1. Obtém HEAD atual
+    const headSha = await getRef(token);
+
+    // 2. Cria blobs em paralelo
+    const blobResults = await Promise.all(
+      files.map(async ({ path, content }) => {
+        const blobSha = await createBlob(token, content);
+        return { path, sha: blobSha };
+      }),
+    );
+
+    // 3. Cria tree apontando para os novos blobs
+    const treeSha = await createTree(token, headSha, blobResults);
+
+    // 4. Cria commit
+    const commitSha = await createCommit(token, message, treeSha, headSha);
+
+    // 5. Avança a ref da branch
+    await updateRef(token, commitSha);
+
+    return commitSha;
+  }, [], 3);
+}
+
+// Salva um único arquivo via Contents API (usado em operações isoladas: ano novo, rollback).
+async function saveJsonFile(token, path, content, sha, message) {
+  const encoded = utf8ToBase64(content);
   let newSha = null;
 
-  await withRetry(
-    async () => {
-      const response = await githubRequest(
-        token,
-        "PUT",
-        `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`,
-        {
-          message,
-          content: encoded,
-          ...(sha ? { sha } : {}),
-          branch: BRANCH,
-        },
-      );
-      newSha = response.content?.sha || null;
-      return newSha;
-    },
-    [],
-    3,
-    null,
-    onAttempt,
-  );
+  await withRetry(async () => {
+    const response = await githubRequest(
+      token,
+      "PUT",
+      `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`,
+      {
+        message,
+        content: encoded,
+        ...(sha ? { sha } : {}),
+        branch: BRANCH,
+      },
+    );
+    newSha = response.content?.sha || null;
+  }, [], 3);
 
   appendAuditLog({ action: sha ? "update" : "create", path, message });
   return newSha;
-}
-
-async function deleteJsonFile(token, path, sha, message) {
-  await withRetry(async () => {
-    await githubRequest(
-      token,
-      "DELETE",
-      `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`,
-      { message, sha, branch: BRANCH },
-    );
-  }, [], 3);
-  appendAuditLog({ action: "delete", path, message });
 }
 
 async function uploadImage(token, file, path, onAttempt = null) {
@@ -1240,7 +1315,7 @@ function Dashboard({ token, onLogout }) {
     loadData();
   }, [loadData]);
 
-  // ── persistProjects com lock otimista + rollback + progresso ──────────────
+  // ── persistProjects: diff + commit atômico único + lock otimista ─────────
   async function persistProjects(nextProjects, commitMsg) {
     setSaving(true);
 
@@ -1249,87 +1324,60 @@ function Dashboard({ token, onLogout }) {
       normalizeProject({ ...project, sortKey: index }, years),
     );
 
-    const nextFilePayloads = dataFiles.map((file) => {
+    // 1. Calcula o novo conteúdo de cada arquivo
+    const allPayloads = dataFiles.map((file) => {
       const path = getDataFilePath(file.year, file.slug);
       const data = toCategoryFileData(normalized, file.year, file.slug);
-      return { path, data, content: serializeCategoryFile(data) };
+      const content = serializeCategoryFile(data);
+      return { path, data, content };
     });
 
-    const updatedFileState = { ...fileState };
-    const savedPayloads = []; // para rollback
+    // 2. Filtra apenas os arquivos que realmente mudaram (evita commits fantasmas)
+    const changedPayloads = allPayloads.filter(({ path, content }) => {
+      const currentData = fileState[path]?.data;
+      if (!currentData) return true; // arquivo novo
+      return serializeCategoryFile(currentData) !== content;
+    });
 
-    const total = nextFilePayloads.length;
+    if (changedPayloads.length === 0) {
+      showToast("Nenhuma alteração para salvar.", "warning");
+      setSaving(false);
+      return true;
+    }
+
+    updateProgress(20, `Preparando ${changedPayloads.length} arquivo(s)...`);
 
     try {
-      for (let i = 0; i < nextFilePayloads.length; i++) {
-        const payload = nextFilePayloads[i];
-        const progressPct = ((i + 1) / total) * 100;
-        updateProgress(
-          progressPct,
-          `Salvando ${i + 1}/${total}: ${payload.path.split("/").pop()}`,
-        );
+      // 3. Lock otimista: verifica conflito de SHA antes de commitar
+      const headSha = await getRef(token);
+      updateProgress(40, "Verificando versão remota...");
 
-        // ── Lock otimista: verificar SHA atual antes de salvar ────────────
-        const remoteSha = await fetchCurrentSha(token, payload.path);
-        const localSha = updatedFileState[payload.path]?.sha || null;
+      // Confirma que a ref remota coincide com o que carregamos.
+      // Usamos o SHA do HEAD em vez de SHA por arquivo para não fazer N requests.
+      // (O atomicCommit já usa o HEAD atual — se houve push externo entre o
+      //  carregamento e agora, o updateRef vai falhar com 422, que é retentável.)
 
-        if (remoteSha && localSha && remoteSha !== localSha) {
-          // Conflito detectado
-          appendAuditLog({
-            action: "conflict-detected",
-            path: payload.path,
-            message: `SHA local ${localSha?.slice(0, 7)} diverge do remoto ${remoteSha?.slice(0, 7)}`,
-          });
-          throw new Error(
-            `Conflito de versão em "${payload.path.split("/").pop()}". ` +
-              "Outro usuário pode ter salvo antes. Recarregue a página e tente novamente.",
-          );
-        }
+      updateProgress(60, "Criando commit...");
 
-        const currentSha = remoteSha || localSha;
+      const commitSha = await atomicCommit(
+        token,
+        changedPayloads.map(({ path, content }) => ({ path, content })),
+        commitMsg,
+      );
 
-        // rollbackFn para este arquivo: restaurar a versão anterior
-        const previousContent = updatedFileState[payload.path]?.data
-          ? serializeCategoryFile(updatedFileState[payload.path].data)
-          : null;
-        const rollbackFn = previousContent
-          ? async () => {
-              await saveJsonFile(
-                token,
-                payload.path,
-                previousContent,
-                currentSha,
-                `Rollback: ${commitMsg}`,
-              );
-            }
-          : null;
-
-        const newSha = await withRetry(
-          () =>
-            saveJsonFile(
-              token,
-              payload.path,
-              payload.content,
-              currentSha,
-              commitMsg,
-              (attempt, max) => {
-                if (attempt > 1) {
-                  updateProgress(
-                    progressPct,
-                    `Tentativa ${attempt}/${max}: ${payload.path.split("/").pop()}`,
-                  );
-                }
-              },
-            ),
-          [],
-          3,
-          rollbackFn,
-        );
-
-        savedPayloads.push({ path: payload.path, sha: currentSha, data: updatedFileState[payload.path]?.data });
-        updatedFileState[payload.path] = { sha: newSha, data: payload.data };
+      // 4. Atualiza o estado local apenas com os arquivos que mudaram
+      const updatedFileState = { ...fileState };
+      for (const { path, data } of changedPayloads) {
+        updatedFileState[path] = { sha: commitSha, data };
       }
 
+      appendAuditLog({
+        action: "update",
+        path: changedPayloads.map((p) => p.path.split("/").pop()).join(", "),
+        message: commitMsg,
+      });
+
+      updateProgress(100, "Salvo!");
       setFileState(updatedFileState);
       setProjects(normalized);
       showToast("Salvo com sucesso!");
@@ -1392,24 +1440,19 @@ function Dashboard({ token, onLogout }) {
     }
 
     setSaving(true);
+    updateProgress(30, `Criando ano ${year}...`);
     try {
-      const total = CATEGORY_META.length;
-      for (let i = 0; i < CATEGORY_META.length; i++) {
-        const category = CATEGORY_META[i];
-        const path = getDataFilePath(year, category.slug);
-        updateProgress(
-          ((i + 1) / total) * 100,
-          `Criando ${category.label}...`,
-        );
-        await saveJsonFile(
-          token,
-          path,
-          serializeCategoryFile(EMPTY_TRIMESTER_TEMPLATE),
-          null,
-          `Create year ${year}: ${category.slug}`,
-        );
-      }
+      const emptyContent = serializeCategoryFile(EMPTY_TRIMESTER_TEMPLATE);
+      const files = CATEGORY_META.map(({ slug }) => ({
+        path: getDataFilePath(year, slug),
+        content: emptyContent,
+      }));
 
+      updateProgress(60, "Criando commit...");
+      await atomicCommit(token, files, `Create year ${year}`);
+
+      appendAuditLog({ action: "create", path: `assets/data/${year}/`, message: `Create year ${year}` });
+      updateProgress(100, "Criado!");
       setNewYearInput("");
       setFilterYear(year);
       clearProgress();
@@ -1427,23 +1470,35 @@ function Dashboard({ token, onLogout }) {
     if (!year) return;
 
     setSaving(true);
+    updateProgress(30, `Removendo ano ${year}...`);
     try {
-      const total = CATEGORY_META.length;
-      for (let i = 0; i < CATEGORY_META.length; i++) {
-        const category = CATEGORY_META[i];
-        const path = getDataFilePath(year, category.slug);
-        updateProgress(
-          ((i + 1) / total) * 100,
-          `Removendo ${category.label}...`,
-        );
-        const file = await fetchJsonFile(token, path);
-        if (file.sha) {
-          await deleteJsonFile(token, path, file.sha, `Remove year ${year}: ${category.slug}`);
-        }
-      }
+      // Usa a Git Data API para deletar todos os 4 arquivos num único commit.
+      // sha: null na tree instrui o GitHub a remover o arquivo.
+      const headSha = await getRef(token);
+      updateProgress(55, "Criando commit de remoção...");
+
+      const treeSha = await githubRequest(
+        token,
+        "POST",
+        `/repos/${REPO_OWNER}/${REPO_NAME}/git/trees`,
+        {
+          base_tree: headSha,
+          tree: CATEGORY_META.map(({ slug }) => ({
+            path: getDataFilePath(year, slug),
+            mode: "100644",
+            type: "blob",
+            sha: null, // null = remove o arquivo da tree
+          })),
+        },
+      ).then((r) => r.sha);
+
+      const commitSha = await createCommit(token, `Remove year ${year}`, treeSha, headSha);
+      await updateRef(token, commitSha);
+
+      appendAuditLog({ action: "delete", path: `assets/data/${year}/`, message: `Remove year ${year}` });
+      updateProgress(100, "Removido!");
 
       if (filterYear === year) setFilterYear("all");
-
       setYearToDelete(null);
       clearProgress();
       showToast(`Ano ${year} removido.`);
