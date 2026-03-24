@@ -84,11 +84,11 @@ const portfolioByYear = Object.fromEntries(
     .map((year) => [year, createPortfolioForYear(year)]),
 );
 
-export const portfolioData =
-  portfolioByYear[getAvailableYears()[0]] || [];
-
 export const getAvailableYears = () =>
   Object.keys(portfolioByYear).sort((a, b) => Number(a) - Number(b));
+
+export const portfolioData =
+  portfolioByYear[getAvailableYears()[0]] || [];
 
 export const isValidYear = (year) => Boolean(portfolioByYear[year]);
 

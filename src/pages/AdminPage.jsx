@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const REPO_OWNER = "vinisebold";
@@ -145,6 +145,65 @@ function serializeCategoryFile(data) {
   return `${JSON.stringify(data, null, 2)}\n`;
 }
 
+// ─── AUDITORIA / LOGS ────────────────────────────────────────────────────────
+const ADMIN_LOG_KEY = "admin_audit_log";
+
+const ACTION_LABELS = {
+  update: "Atualização de arquivo",
+  create: "Criação de arquivo",
+  delete: "Remoção de arquivo",
+  "update-image": "Substituição de imagem",
+  "create-image": "Upload de imagem",
+  "conflict-detected": "Conflito de versão detectado",
+  "rollback": "Rollback executado",
+};
+
+function appendAuditLog(entry) {
+  const logs = JSON.parse(localStorage.getItem(ADMIN_LOG_KEY) || "[]");
+  logs.push({ ...entry, timestamp: new Date().toISOString() });
+  localStorage.setItem(ADMIN_LOG_KEY, JSON.stringify(logs.slice(-1000)));
+}
+
+function getAuditLog() {
+  return JSON.parse(localStorage.getItem(ADMIN_LOG_KEY) || "[]");
+}
+
+function clearAuditLog() {
+  localStorage.removeItem(ADMIN_LOG_KEY);
+}
+
+// ─── RETRY / ROLLBACK ─────────────────────────────────────────────────────────
+async function withRetry(fn, args = [], maxAttempts = 3, rollbackFn = null, onAttempt = null) {
+  let lastErr;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      if (onAttempt) onAttempt(attempt, maxAttempts);
+      return await fn(...args);
+    } catch (err) {
+      lastErr = err;
+
+      // Erros 4xx (exceto 409 Conflict e 422) não são retentáveis
+      const status = err?.status || 0;
+      const nonRetryable = status >= 400 && status < 500 && status !== 409 && status !== 422;
+      if (nonRetryable || attempt === maxAttempts) {
+        if (rollbackFn) {
+          try {
+            await rollbackFn();
+            appendAuditLog({ action: "rollback", error: err.message });
+          } catch {}
+        }
+        break;
+      }
+
+      // Backoff exponencial com jitter
+      const delay = Math.min(400 * Math.pow(2, attempt - 1) + Math.random() * 200, 8000);
+      await new Promise((res) => setTimeout(res, delay));
+    }
+  }
+  throw lastErr;
+}
+
+// ─── GITHUB API ───────────────────────────────────────────────────────────────
 async function githubRequest(token, method, endpoint, body = null) {
   const res = await fetch(`https://api.github.com${endpoint}`, {
     method,
@@ -158,7 +217,9 @@ async function githubRequest(token, method, endpoint, body = null) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || `GitHub API error ${res.status}`);
+    const error = new Error(err.message || `GitHub API error ${res.status}`);
+    error.status = res.status;
+    throw error;
   }
 
   return res.json();
@@ -190,7 +251,6 @@ async function fetchJsonFile(token, path) {
         exists: false,
       };
     }
-
     throw error;
   }
 }
@@ -211,46 +271,69 @@ async function fetchAvailableYears(token) {
   return sortYears(years);
 }
 
-async function saveJsonFile(token, path, content, sha, message) {
-  const encoded = btoa(unescape(encodeURIComponent(content)));
+// Verifica o SHA atual do arquivo no repositório (lock otimista)
+async function fetchCurrentSha(token, path) {
+  try {
+    const file = await githubRequest(
+      token,
+      "GET",
+      `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}?ref=${BRANCH}`,
+    );
+    return file.sha || null;
+  } catch {
+    return null;
+  }
+}
 
-  const response = await githubRequest(
-    token,
-    "PUT",
-    `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`,
-    {
-      message,
-      content: encoded,
-      ...(sha ? { sha } : {}),
-      branch: BRANCH,
+async function saveJsonFile(token, path, content, sha, message, onAttempt = null) {
+  const encoded = btoa(unescape(encodeURIComponent(content)));
+  let newSha = null;
+
+  await withRetry(
+    async () => {
+      const response = await githubRequest(
+        token,
+        "PUT",
+        `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`,
+        {
+          message,
+          content: encoded,
+          ...(sha ? { sha } : {}),
+          branch: BRANCH,
+        },
+      );
+      newSha = response.content?.sha || null;
+      return newSha;
     },
+    [],
+    3,
+    null,
+    onAttempt,
   );
 
-  return response.content?.sha || null;
+  appendAuditLog({ action: sha ? "update" : "create", path, message });
+  return newSha;
 }
 
 async function deleteJsonFile(token, path, sha, message) {
-  await githubRequest(
-    token,
-    "DELETE",
-    `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`,
-    {
-      message,
-      sha,
-      branch: BRANCH,
-    },
-  );
+  await withRetry(async () => {
+    await githubRequest(
+      token,
+      "DELETE",
+      `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`,
+      { message, sha, branch: BRANCH },
+    );
+  }, [], 3);
+  appendAuditLog({ action: "delete", path, message });
 }
 
-async function uploadImage(token, file, path) {
+async function uploadImage(token, file, path, onAttempt = null) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-
     reader.onload = async () => {
       try {
         const base64 = reader.result.split(",")[1];
         let sha;
-
         try {
           const existing = await githubRequest(
             token,
@@ -262,18 +345,27 @@ async function uploadImage(token, file, path) {
           sha = undefined;
         }
 
-        await githubRequest(
-          token,
-          "PUT",
-          `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`,
-          {
-            message: `Upload image: ${path}`,
-            content: base64,
-            ...(sha ? { sha } : {}),
-            branch: BRANCH,
+        await withRetry(
+          async () => {
+            await githubRequest(
+              token,
+              "PUT",
+              `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`,
+              {
+                message: `Upload image: ${path}`,
+                content: base64,
+                ...(sha ? { sha } : {}),
+                branch: BRANCH,
+              },
+            );
           },
+          [],
+          3,
+          null,
+          onAttempt,
         );
 
+        appendAuditLog({ action: sha ? "update-image" : "create-image", path });
         resolve(
           `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${path}`,
         );
@@ -281,7 +373,6 @@ async function uploadImage(token, file, path) {
         reject(error);
       }
     };
-
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
@@ -302,6 +393,85 @@ function buildEmptyProject(defaultYear, defaultCategory = CATEGORY_META[0].slug)
   };
 }
 
+// ─── IMAGE COM FALLBACK ───────────────────────────────────────────────────────
+// Mostra skeleton durante carregamento e um estado visual de "não encontrada"
+// sem recorrer a serviços externos (sem picsum, sem placeholder.com etc.).
+function ProjectImage({ src, alt = "", className = "", numberLabel }) {
+  const [status, setStatus] = useState("loading"); // "loading" | "ok" | "broken"
+
+  // Reinicia estado quando a src muda (troca de imagem)
+  useEffect(() => {
+    if (!src) { setStatus("broken"); return; }
+    setStatus("loading");
+  }, [src]);
+
+  const filename = src ? src.split("/").pop() : "";
+
+  return (
+    <div className={`relative overflow-hidden bg-stone-100 ${className}`}>
+      {/* Skeleton de carregamento */}
+      {status === "loading" && (
+        <div className="absolute inset-0 bg-stone-200 animate-pulse" />
+      )}
+
+      {/* Imagem real */}
+      {src && (
+        <img
+          src={src}
+          alt={alt}
+          className={`w-full h-full object-cover transition-opacity duration-300 ${
+            status === "ok" ? "opacity-100" : "opacity-0 absolute inset-0"
+          }`}
+          onLoad={() => setStatus("ok")}
+          onError={() => setStatus("broken")}
+        />
+      )}
+
+      {/* Estado de imagem não encontrada */}
+      {status === "broken" && (
+        <div
+          className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-2"
+          title={src || "Sem imagem"}
+        >
+          {/* Ícone simples: moldura quebrada em SVG inline */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-6 h-6 text-stone-300"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.2}
+          >
+            <rect x="3" y="3" width="18" height="18" rx="1" />
+            <path d="M3 16l5-5 4 4 3-3 6 5" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <line x1="3" y1="3" x2="21" y2="21" strokeDasharray="3 2" strokeOpacity="0.4" />
+          </svg>
+          {filename && (
+            <span
+              className="text-[10px] text-stone-400 font-mono text-center leading-tight break-all line-clamp-2 px-1"
+              title={src}
+            >
+              {filename}
+            </span>
+          )}
+          <span className="text-[9px] tracking-widest uppercase text-stone-300">
+            não encontrada
+          </span>
+        </div>
+      )}
+
+      {/* Badge numérico (usado na grade de imagens do formulário) */}
+      {numberLabel !== undefined && status !== "loading" && (
+        <span className="absolute bottom-1 left-1 bg-black/60 text-white text-xs px-1 py-0.5 z-10">
+          {numberLabel}
+        </span>
+      )}
+    </div>
+  );
+}
+
+// ─── UI PRIMITIVES ────────────────────────────────────────────────────────────
 function Input({ label, value, onChange, placeholder, type = "text", required }) {
   return (
     <div className="flex flex-col gap-1">
@@ -337,14 +507,7 @@ function Select({ label, value, onChange, options }) {
   );
 }
 
-function Btn({
-  children,
-  onClick,
-  variant = "primary",
-  disabled,
-  small,
-  type = "button",
-}) {
+function Btn({ children, onClick, variant = "primary", disabled, small, type = "button" }) {
   const base =
     "tracking-[0.1em] uppercase text-xs transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed";
   const variants = {
@@ -365,14 +528,19 @@ function Btn({
   );
 }
 
+// ─── TOAST ────────────────────────────────────────────────────────────────────
 function Toast({ msg, type }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 text-sm tracking-wide z-50 ${
-        type === "error" ? "bg-red-600 text-white" : "bg-stone-900 text-white"
+      className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 text-sm tracking-wide z-[60] max-w-md text-center shadow-lg ${
+        type === "error"
+          ? "bg-red-600 text-white"
+          : type === "warning"
+          ? "bg-amber-500 text-white"
+          : "bg-stone-900 text-white"
       }`}
     >
       {msg}
@@ -380,6 +548,201 @@ function Toast({ msg, type }) {
   );
 }
 
+// ─── PROGRESS BAR ─────────────────────────────────────────────────────────────
+function ProgressBar({ progress, label, visible }) {
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          className="fixed top-0 left-0 right-0 z-[70] bg-white shadow-sm"
+        >
+          <div className="h-0.5 bg-stone-100 w-full">
+            <motion.div
+              className="h-full bg-stone-900"
+              initial={{ width: "0%" }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            />
+          </div>
+          <div className="max-w-6xl mx-auto px-8 py-2 flex items-center gap-3">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-3 h-3 border border-stone-900 border-t-transparent rounded-full flex-shrink-0"
+            />
+            <p className="text-xs tracking-[0.15em] uppercase text-stone-600">{label}</p>
+            <span className="ml-auto text-xs text-stone-400">{Math.round(progress)}%</span>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// ─── AUDIT LOG PANEL ──────────────────────────────────────────────────────────
+function AuditLogPanel({ onClose }) {
+  const [logs, setLogs] = useState(() => getAuditLog().reverse());
+
+  function handleClear() {
+    clearAuditLog();
+    setLogs([]);
+  }
+
+  function formatTime(iso) {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    } catch {
+      return iso;
+    }
+  }
+
+  const actionColor = {
+    update: "text-blue-600",
+    create: "text-green-600",
+    delete: "text-red-600",
+    "update-image": "text-amber-600",
+    "create-image": "text-emerald-600",
+    "conflict-detected": "text-orange-600",
+    rollback: "text-purple-600",
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 bg-black/40 flex justify-end"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ type: "tween", duration: 0.3, ease: "easeOut" }}
+        className="bg-[#F5F3F0] w-full max-w-lg h-full overflow-hidden flex flex-col shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="border-b border-stone-200 bg-white px-6 py-4 flex items-center justify-between flex-shrink-0">
+          <div>
+            <p className="text-xs tracking-[0.3em] uppercase text-stone-400">Admin</p>
+            <h2 className="text-lg font-light text-stone-900" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              Log de Auditoria
+            </h2>
+          </div>
+          <div className="flex items-center gap-3">
+            {logs.length > 0 && (
+              <button
+                onClick={handleClear}
+                className="text-xs tracking-widest uppercase text-red-400 hover:text-red-600 transition-colors"
+              >
+                Limpar
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="text-xs tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto">
+          {logs.length === 0 ? (
+            <div className="flex items-center justify-center h-40">
+              <p className="text-sm text-stone-400 tracking-wide">Nenhuma entrada no log.</p>
+            </div>
+          ) : (
+            <ul className="divide-y divide-stone-200">
+              {logs.map((entry, i) => (
+                <li key={i} className="px-6 py-4 bg-white hover:bg-stone-50 transition-colors">
+                  <div className="flex items-start justify-between gap-4 mb-1">
+                    <span
+                      className={`text-xs tracking-[0.1em] uppercase font-medium ${
+                        actionColor[entry.action] || "text-stone-600"
+                      }`}
+                    >
+                      {ACTION_LABELS[entry.action] || entry.action}
+                    </span>
+                    <span className="text-xs text-stone-400 flex-shrink-0">
+                      {formatTime(entry.timestamp)}
+                    </span>
+                  </div>
+                  {entry.path && (
+                    <p className="text-xs text-stone-500 font-mono break-all">{entry.path}</p>
+                  )}
+                  {entry.message && (
+                    <p className="text-xs text-stone-400 mt-0.5 italic">{entry.message}</p>
+                  )}
+                  {entry.error && (
+                    <p className="text-xs text-red-500 mt-0.5">Erro: {entry.error}</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="border-t border-stone-200 px-6 py-3 bg-white flex-shrink-0">
+          <p className="text-xs text-stone-400">
+            {logs.length} {logs.length === 1 ? "entrada" : "entradas"} · armazenado localmente
+          </p>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ─── CONFIRM MODAL (genérico) ─────────────────────────────────────────────────
+function ConfirmModal({ title, description, confirmLabel = "Confirmar", variant = "danger", onConfirm, onCancel, saving }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center px-6"
+    >
+      <motion.div
+        initial={{ scale: 0.96, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.96, opacity: 0 }}
+        className="bg-white p-8 max-w-sm w-full"
+      >
+        <h3
+          className="text-lg font-light mb-2"
+          style={{ fontFamily: "'Cormorant Garamond', serif" }}
+        >
+          {title}
+        </h3>
+        <p className="text-sm text-stone-500 mb-6">{description}</p>
+        <div className="flex gap-3">
+          <Btn variant={variant} disabled={saving} onClick={onConfirm}>
+            {saving ? "Aguarde..." : confirmLabel}
+          </Btn>
+          <Btn variant="ghost" onClick={onCancel} disabled={saving}>
+            Cancelar
+          </Btn>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ─── LOGIN ────────────────────────────────────────────────────────────────────
 function LoginScreen({ onLogin }) {
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
@@ -411,7 +774,10 @@ function LoginScreen({ onLogin }) {
       >
         <div className="mb-12">
           <p className="text-xs tracking-[0.3em] uppercase text-stone-400 mb-3">Portfólio Admin</p>
-          <h1 className="text-4xl font-light text-stone-900" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+          <h1
+            className="text-4xl font-light text-stone-900"
+            style={{ fontFamily: "'Cormorant Garamond', serif" }}
+          >
             Acesso Restrito
           </h1>
           <div className="mt-4 w-8 h-px bg-stone-900" />
@@ -449,11 +815,18 @@ function LoginScreen({ onLogin }) {
   );
 }
 
+// ─── PROJECT FORM ─────────────────────────────────────────────────────────────
 function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
   const [form, setForm] = useState(() => normalizeProject(project, years));
   const [skillInput, setSkillInput] = useState("");
   const [imageInput, setImageInput] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null);
+
+  // Confirmação de remoção de imagem
+  const [imageRemoveConfirm, setImageRemoveConfirm] = useState(null); // index
+  // Confirmação de sobrescrita de imagem (upload)
+  const [imageOverwriteConfirm, setImageOverwriteConfirm] = useState(null); // { file, path }
 
   function set(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -479,27 +852,57 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
     }
   }
 
-  function removeImage(index) {
-    set("images", form.images.filter((_, imageIndex) => imageIndex !== index));
+  function requestRemoveImage(index) {
+    setImageRemoveConfirm(index);
+  }
+
+  function confirmRemoveImage() {
+    set("images", form.images.filter((_, i) => i !== imageRemoveConfirm));
+    setImageRemoveConfirm(null);
+  }
+
+  async function doUpload(file, path) {
+    setUploading(true);
+    setUploadProgress({ label: "Enviando imagem...", attempt: 1 });
+    try {
+      const url = await uploadImage(token, file, path, (attempt, max) => {
+        setUploadProgress({
+          label: attempt > 1 ? `Tentativa ${attempt}/${max}...` : "Enviando imagem...",
+          attempt,
+        });
+      });
+      set("images", [...form.images, url]);
+    } catch (error) {
+      // Usa toast via evento customizado (comunicação com Dashboard)
+      window.dispatchEvent(
+        new CustomEvent("admin-toast", {
+          detail: { msg: `Erro ao fazer upload: ${error.message}`, type: "error" },
+        }),
+      );
+    } finally {
+      setUploading(false);
+      setUploadProgress(null);
+    }
   }
 
   async function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
+    event.target.value = "";
 
-    setUploading(true);
-    try {
-      const ext = file.name.split(".").pop();
-      const fileName = `${form.id}_${Date.now()}.${ext}`;
-      const path = `assets/images/${form.year}/${form.trimester}tri/${form.categorySlug}/uploads/${fileName}`;
-      const url = await uploadImage(token, file, path);
-      set("images", [...form.images, url]);
-    } catch (error) {
-      alert(`Erro ao fazer upload: ${error.message}`);
-    } finally {
-      setUploading(false);
-      event.target.value = "";
+    const ext = file.name.split(".").pop();
+    const fileName = `${form.id}_${Date.now()}.${ext}`;
+    const path = `assets/images/${form.year}/${form.trimester}tri/${form.categorySlug}/uploads/${fileName}`;
+
+    // Verifica se já existe imagem com o mesmo nome no form
+    const alreadyExists = form.images.some((img) => img.includes(fileName));
+
+    if (alreadyExists) {
+      setImageOverwriteConfirm({ file, path });
+      return;
     }
+
+    await doUpload(file, path);
   }
 
   function handleSubmit(event) {
@@ -513,25 +916,63 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
       animate={{ opacity: 1 }}
       className="fixed inset-0 z-40 bg-[#F5F3F0]/95 overflow-y-auto"
     >
+      {/* Upload progress indicator */}
+      <AnimatePresence>
+        {uploadProgress && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="fixed top-0 left-0 right-0 z-50 bg-stone-900 text-white py-2 px-6 flex items-center gap-3"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-3 h-3 border border-white border-t-transparent rounded-full flex-shrink-0"
+            />
+            <span className="text-xs tracking-[0.15em] uppercase">{uploadProgress.label}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="max-w-2xl mx-auto px-8 py-16">
         <div className="mb-10 flex items-start justify-between">
           <div>
             <p className="text-xs tracking-[0.3em] uppercase text-stone-400 mb-2">
               {project.title ? "Editar" : "Novo"} Projeto
             </p>
-            <h2 className="text-3xl font-light text-stone-900" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+            <h2
+              className="text-3xl font-light text-stone-900"
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
+            >
               {form.title || "Sem título"}
             </h2>
           </div>
-          <button type="button" onClick={onCancel} className="text-stone-400 hover:text-stone-900 text-xs tracking-widest uppercase mt-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="text-stone-400 hover:text-stone-900 text-xs tracking-widest uppercase mt-2"
+          >
             Cancelar
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-8">
           <div className="grid grid-cols-1 gap-6">
-            <Input label="Título" value={form.title} onChange={(v) => set("title", v)} required placeholder="Nome do projeto" />
-            <Input label="Link (opcional)" value={form.link} onChange={(v) => set("link", v)} type="url" placeholder="https://..." />
+            <Input
+              label="Título"
+              value={form.title}
+              onChange={(v) => set("title", v)}
+              required
+              placeholder="Nome do projeto"
+            />
+            <Input
+              label="Link (opcional)"
+              value={form.link}
+              onChange={(v) => set("link", v)}
+              type="url"
+              placeholder="https://..."
+            />
             <div className="flex flex-col gap-1">
               <label className="text-xs tracking-[0.15em] uppercase text-stone-500">Descrição</label>
               <textarea
@@ -555,7 +996,10 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
               label="Categoria"
               value={form.categorySlug}
               onChange={(v) => set("categorySlug", v)}
-              options={CATEGORY_META.map((category) => ({ value: category.slug, label: category.label }))}
+              options={CATEGORY_META.map((category) => ({
+                value: category.slug,
+                label: category.label,
+              }))}
             />
           </div>
 
@@ -563,9 +1007,13 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
             label="Trimestre"
             value={form.trimester}
             onChange={(v) => set("trimester", v)}
-            options={TRIMESTERS.map((trimester) => ({ value: trimester, label: TRIMESTER_LABELS[trimester] }))}
+            options={TRIMESTERS.map((trimester) => ({
+              value: trimester,
+              label: TRIMESTER_LABELS[trimester],
+            }))}
           />
 
+          {/* Habilidades */}
           <div className="flex flex-col gap-3">
             <label className="text-xs tracking-[0.15em] uppercase text-stone-500">Habilidades</label>
             <div className="flex gap-2">
@@ -586,12 +1034,18 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
                 Adicionar
               </Btn>
             </div>
-
             <div className="flex flex-wrap gap-2 mt-1">
               {form.skills.map((skill) => (
-                <span key={skill} className="flex items-center gap-1 text-xs tracking-wide border border-stone-300 px-3 py-1 text-stone-700">
+                <span
+                  key={skill}
+                  className="flex items-center gap-1 text-xs tracking-wide border border-stone-300 px-3 py-1 text-stone-700"
+                >
                   {skill}
-                  <button type="button" onClick={() => removeSkill(skill)} className="ml-1 text-stone-400 hover:text-red-500 text-base leading-none">
+                  <button
+                    type="button"
+                    onClick={() => removeSkill(skill)}
+                    className="ml-1 text-stone-400 hover:text-red-500 text-base leading-none"
+                  >
                     &times;
                   </button>
                 </span>
@@ -599,6 +1053,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
             </div>
           </div>
 
+          {/* Imagens */}
           <div className="flex flex-col gap-3">
             <label className="text-xs tracking-[0.15em] uppercase text-stone-500">Imagens</label>
 
@@ -636,25 +1091,24 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
             {form.images.length > 0 && (
               <div className="grid grid-cols-3 gap-3 mt-2">
                 {form.images.map((img, index) => (
-                  <div key={`${img}-${index}`} className="relative group aspect-video bg-stone-100 overflow-hidden">
-                    <img
+                  <div
+                    key={`${img}-${index}`}
+                    className="relative group aspect-video"
+                  >
+                    <ProjectImage
                       src={img}
                       alt=""
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = `https://picsum.photos/seed/${index}/400/300`;
-                      }}
+                      className="w-full h-full aspect-video"
+                      numberLabel={index + 1}
                     />
                     <button
                       type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-1 right-1 bg-red-600 text-white text-xs w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => requestRemoveImage(index)}
+                      className="absolute top-1 right-1 z-10 bg-red-600 text-white text-xs w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Remover imagem"
                     >
                       ×
                     </button>
-                    <span className="absolute bottom-1 left-1 bg-black/60 text-white text-xs px-1 py-0.5">
-                      {index + 1}
-                    </span>
                   </div>
                 ))}
               </div>
@@ -671,10 +1125,43 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
           </div>
         </form>
       </div>
+
+      {/* Confirmação remoção de imagem */}
+      <AnimatePresence>
+        {imageRemoveConfirm !== null && (
+          <ConfirmModal
+            title="Remover imagem?"
+            description="A imagem será removida da lista do projeto. O arquivo no repositório não é apagado automaticamente."
+            confirmLabel="Remover"
+            variant="danger"
+            onConfirm={confirmRemoveImage}
+            onCancel={() => setImageRemoveConfirm(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Confirmação sobrescrita de imagem */}
+      <AnimatePresence>
+        {imageOverwriteConfirm && (
+          <ConfirmModal
+            title="Sobrescrever imagem?"
+            description="Já existe uma imagem com este nome no repositório. Deseja substituí-la?"
+            confirmLabel="Substituir"
+            variant="danger"
+            onConfirm={async () => {
+              const { file, path } = imageOverwriteConfirm;
+              setImageOverwriteConfirm(null);
+              await doUpload(file, path);
+            }}
+            onCancel={() => setImageOverwriteConfirm(null)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
 
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
 function Dashboard({ token, onLogout }) {
   const [years, setYears] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -689,11 +1176,36 @@ function Dashboard({ token, onLogout }) {
   const [filterCat, setFilterCat] = useState("all");
   const [filterTri, setFilterTri] = useState("all");
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [showAuditLog, setShowAuditLog] = useState(false);
+
+  // Progresso de operações longas
+  const [progress, setProgress] = useState({ visible: false, value: 0, label: "" });
+
+  // Ref para evitar múltiplos toasts simultâneos
+  const toastTimeout = useRef(null);
 
   function showToast(msg, type = "success") {
+    if (toastTimeout.current) clearTimeout(toastTimeout.current);
     setToast({ msg, type });
-    setTimeout(() => setToast(null), 3200);
+    toastTimeout.current = setTimeout(() => setToast(null), 3200);
   }
+
+  function updateProgress(value, label) {
+    setProgress({ visible: true, value, label });
+  }
+
+  function clearProgress() {
+    setProgress({ visible: false, value: 0, label: "" });
+  }
+
+  // Listener para toasts disparados pelo ProjectForm
+  useEffect(() => {
+    function onAdminToast(e) {
+      showToast(e.detail.msg, e.detail.type);
+    }
+    window.addEventListener("admin-toast", onAdminToast);
+    return () => window.removeEventListener("admin-toast", onAdminToast);
+  }, []);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -705,10 +1217,7 @@ function Dashboard({ token, onLogout }) {
           const fetched = await fetchJsonFile(token, file.path);
           return [
             file.path,
-            {
-              sha: fetched.sha,
-              data: fetched.data,
-            },
+            { sha: fetched.sha, data: fetched.data },
           ];
         }),
       );
@@ -731,47 +1240,103 @@ function Dashboard({ token, onLogout }) {
     loadData();
   }, [loadData]);
 
+  // ── persistProjects com lock otimista + rollback + progresso ──────────────
   async function persistProjects(nextProjects, commitMsg) {
     setSaving(true);
 
+    const dataFiles = buildDataFiles(years);
+    const normalized = nextProjects.map((project, index) =>
+      normalizeProject({ ...project, sortKey: index }, years),
+    );
+
+    const nextFilePayloads = dataFiles.map((file) => {
+      const path = getDataFilePath(file.year, file.slug);
+      const data = toCategoryFileData(normalized, file.year, file.slug);
+      return { path, data, content: serializeCategoryFile(data) };
+    });
+
+    const updatedFileState = { ...fileState };
+    const savedPayloads = []; // para rollback
+
+    const total = nextFilePayloads.length;
+
     try {
-      const dataFiles = buildDataFiles(years);
-      const normalized = nextProjects.map((project, index) =>
-        normalizeProject({ ...project, sortKey: index }, years),
-      );
-
-      const nextFilePayloads = dataFiles.map((file) => {
-        const path = getDataFilePath(file.year, file.slug);
-        const data = toCategoryFileData(normalized, file.year, file.slug);
-        return {
-          path,
-          data,
-          content: serializeCategoryFile(data),
-        };
-      });
-
-      const updatedFileState = { ...fileState };
-      for (const payload of nextFilePayloads) {
-        const currentSha = updatedFileState[payload.path]?.sha || null;
-        const newSha = await saveJsonFile(
-          token,
-          payload.path,
-          payload.content,
-          currentSha,
-          commitMsg,
+      for (let i = 0; i < nextFilePayloads.length; i++) {
+        const payload = nextFilePayloads[i];
+        const progressPct = ((i + 1) / total) * 100;
+        updateProgress(
+          progressPct,
+          `Salvando ${i + 1}/${total}: ${payload.path.split("/").pop()}`,
         );
 
-        updatedFileState[payload.path] = {
-          sha: newSha,
-          data: payload.data,
-        };
+        // ── Lock otimista: verificar SHA atual antes de salvar ────────────
+        const remoteSha = await fetchCurrentSha(token, payload.path);
+        const localSha = updatedFileState[payload.path]?.sha || null;
+
+        if (remoteSha && localSha && remoteSha !== localSha) {
+          // Conflito detectado
+          appendAuditLog({
+            action: "conflict-detected",
+            path: payload.path,
+            message: `SHA local ${localSha?.slice(0, 7)} diverge do remoto ${remoteSha?.slice(0, 7)}`,
+          });
+          throw new Error(
+            `Conflito de versão em "${payload.path.split("/").pop()}". ` +
+              "Outro usuário pode ter salvo antes. Recarregue a página e tente novamente.",
+          );
+        }
+
+        const currentSha = remoteSha || localSha;
+
+        // rollbackFn para este arquivo: restaurar a versão anterior
+        const previousContent = updatedFileState[payload.path]?.data
+          ? serializeCategoryFile(updatedFileState[payload.path].data)
+          : null;
+        const rollbackFn = previousContent
+          ? async () => {
+              await saveJsonFile(
+                token,
+                payload.path,
+                previousContent,
+                currentSha,
+                `Rollback: ${commitMsg}`,
+              );
+            }
+          : null;
+
+        const newSha = await withRetry(
+          () =>
+            saveJsonFile(
+              token,
+              payload.path,
+              payload.content,
+              currentSha,
+              commitMsg,
+              (attempt, max) => {
+                if (attempt > 1) {
+                  updateProgress(
+                    progressPct,
+                    `Tentativa ${attempt}/${max}: ${payload.path.split("/").pop()}`,
+                  );
+                }
+              },
+            ),
+          [],
+          3,
+          rollbackFn,
+        );
+
+        savedPayloads.push({ path: payload.path, sha: currentSha, data: updatedFileState[payload.path]?.data });
+        updatedFileState[payload.path] = { sha: newSha, data: payload.data };
       }
 
       setFileState(updatedFileState);
       setProjects(normalized);
       showToast("Salvo com sucesso!");
+      clearProgress();
       return true;
     } catch (error) {
+      clearProgress();
       showToast(`Erro ao salvar: ${error.message}`, "error");
       return false;
     } finally {
@@ -828,8 +1393,14 @@ function Dashboard({ token, onLogout }) {
 
     setSaving(true);
     try {
-      for (const category of CATEGORY_META) {
+      const total = CATEGORY_META.length;
+      for (let i = 0; i < CATEGORY_META.length; i++) {
+        const category = CATEGORY_META[i];
         const path = getDataFilePath(year, category.slug);
+        updateProgress(
+          ((i + 1) / total) * 100,
+          `Criando ${category.label}...`,
+        );
         await saveJsonFile(
           token,
           path,
@@ -841,9 +1412,11 @@ function Dashboard({ token, onLogout }) {
 
       setNewYearInput("");
       setFilterYear(year);
+      clearProgress();
       showToast(`Ano ${year} criado com sucesso.`);
       await loadData();
     } catch (error) {
+      clearProgress();
       showToast(`Erro ao criar ano: ${error.message}`, "error");
     } finally {
       setSaving(false);
@@ -855,27 +1428,28 @@ function Dashboard({ token, onLogout }) {
 
     setSaving(true);
     try {
-      for (const category of CATEGORY_META) {
+      const total = CATEGORY_META.length;
+      for (let i = 0; i < CATEGORY_META.length; i++) {
+        const category = CATEGORY_META[i];
         const path = getDataFilePath(year, category.slug);
+        updateProgress(
+          ((i + 1) / total) * 100,
+          `Removendo ${category.label}...`,
+        );
         const file = await fetchJsonFile(token, path);
         if (file.sha) {
-          await deleteJsonFile(
-            token,
-            path,
-            file.sha,
-            `Remove year ${year}: ${category.slug}`,
-          );
+          await deleteJsonFile(token, path, file.sha, `Remove year ${year}: ${category.slug}`);
         }
       }
 
-      if (filterYear === year) {
-        setFilterYear("all");
-      }
+      if (filterYear === year) setFilterYear("all");
 
       setYearToDelete(null);
+      clearProgress();
       showToast(`Ano ${year} removido.`);
       await loadData();
     } catch (error) {
+      clearProgress();
       showToast(`Erro ao remover ano: ${error.message}`, "error");
     } finally {
       setSaving(false);
@@ -909,23 +1483,40 @@ function Dashboard({ token, onLogout }) {
 
   return (
     <div className="min-h-screen bg-[#F5F3F0]">
+      {/* Barra de progresso global */}
+      <ProgressBar
+        visible={progress.visible}
+        value={progress.value}
+        label={progress.label}
+      />
+
       <header className="border-b border-stone-200 bg-white sticky top-0 z-30">
         <div className="max-w-6xl mx-auto px-8 py-4 flex items-center justify-between">
           <div>
             <p className="text-xs tracking-[0.3em] uppercase text-stone-400">Painel Admin</p>
-            <h1 className="text-xl font-light text-stone-900" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+            <h1
+              className="text-xl font-light text-stone-900"
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
+            >
               Portfólio · {projects.length} projetos
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            <Btn
-              small
-              disabled={years.length === 0}
-              onClick={openNewProjectForm}
-            >
+            <Btn small disabled={years.length === 0} onClick={openNewProjectForm}>
               + Novo projeto
             </Btn>
-            <button type="button" onClick={onLogout} className="text-xs tracking-widest uppercase text-stone-400 hover:text-stone-700 transition-colors">
+            <button
+              type="button"
+              onClick={() => setShowAuditLog(true)}
+              className="text-xs tracking-widest uppercase text-stone-400 hover:text-stone-700 transition-colors"
+            >
+              Log
+            </button>
+            <button
+              type="button"
+              onClick={onLogout}
+              className="text-xs tracking-widest uppercase text-stone-400 hover:text-stone-700 transition-colors"
+            >
               Sair
             </button>
           </div>
@@ -933,6 +1524,7 @@ function Dashboard({ token, onLogout }) {
       </header>
 
       <main className="max-w-6xl mx-auto px-8 py-10">
+        {/* Gerenciar anos */}
         <div className="mb-8 pb-6 border-b border-stone-200">
           <p className="text-xs tracking-widest uppercase text-stone-400 mb-3">Gerenciar anos</p>
           <div className="flex flex-wrap items-center gap-3">
@@ -959,6 +1551,7 @@ function Dashboard({ token, onLogout }) {
           </div>
         </div>
 
+        {/* Filtros */}
         <div className="flex flex-wrap gap-4 mb-8 pb-6 border-b border-stone-200">
           <div className="flex gap-2 items-center">
             <span className="text-xs tracking-widest uppercase text-stone-400">Ano:</span>
@@ -1013,13 +1606,11 @@ function Dashboard({ token, onLogout }) {
           </span>
         </div>
 
+        {/* Grid de projetos */}
         {filtered.length === 0 ? (
           <div className="text-center py-24">
             <p className="text-stone-400 text-sm tracking-wide mb-4">Nenhum projeto encontrado</p>
-            <Btn
-              disabled={years.length === 0}
-              onClick={openNewProjectForm}
-            >
+            <Btn disabled={years.length === 0} onClick={openNewProjectForm}>
               + Criar primeiro projeto
             </Btn>
           </div>
@@ -1034,34 +1625,40 @@ function Dashboard({ token, onLogout }) {
                 className="bg-[#F5F3F0] p-6 flex flex-col gap-3"
               >
                 {project.images?.[0] && (
-                  <div className="aspect-video bg-stone-100 overflow-hidden mb-2">
-                    <img
+                  <div className="aspect-video mb-2">
+                    <ProjectImage
                       src={project.images[0]}
                       alt={project.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = `https://picsum.photos/seed/${project.id}/400/300`;
-                      }}
+                      className="w-full h-full"
                     />
                   </div>
                 )}
 
                 <div>
                   <p className="text-xs tracking-[0.15em] uppercase text-stone-400 mb-1">
-                    {project.year} · {getCategoryLabel(project.categorySlug)} · {TRIMESTER_LABELS[project.trimester] || project.trimester}
+                    {project.year} · {getCategoryLabel(project.categorySlug)} ·{" "}
+                    {TRIMESTER_LABELS[project.trimester] || project.trimester}
                   </p>
-                  <h3 className="text-base font-light text-stone-900" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                  <h3
+                    className="text-base font-light text-stone-900"
+                    style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                  >
                     {project.title}
                   </h3>
                   {project.description && (
-                    <p className="text-xs text-stone-500 mt-1 line-clamp-2">{project.description}</p>
+                    <p className="text-xs text-stone-500 mt-1 line-clamp-2">
+                      {project.description}
+                    </p>
                   )}
                 </div>
 
                 {project.skills?.length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {project.skills.slice(0, 3).map((skill) => (
-                      <span key={skill} className="text-xs border border-stone-300 px-2 py-0.5 text-stone-500">
+                      <span
+                        key={skill}
+                        className="text-xs border border-stone-300 px-2 py-0.5 text-stone-500"
+                      >
                         {skill}
                       </span>
                     ))}
@@ -1093,6 +1690,7 @@ function Dashboard({ token, onLogout }) {
         )}
       </main>
 
+      {/* Formulário de edição */}
       <AnimatePresence>
         {editing && (
           <ProjectForm
@@ -1106,74 +1704,47 @@ function Dashboard({ token, onLogout }) {
         )}
       </AnimatePresence>
 
+      {/* Modal: confirmar exclusão de projeto */}
       <AnimatePresence>
         {deleteConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center px-6"
-          >
-            <motion.div
-              initial={{ scale: 0.96, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.96, opacity: 0 }}
-              className="bg-white p-8 max-w-sm w-full"
-            >
-              <h3 className="text-lg font-light mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                Remover projeto?
-              </h3>
-              <p className="text-sm text-stone-500 mb-6">
-                Esta ação fará commits no repositório removendo o projeto do arquivo JSON correspondente.
-              </p>
-              <div className="flex gap-3">
-                <Btn variant="danger" disabled={saving} onClick={() => handleDelete(deleteConfirm)}>
-                  {saving ? "Removendo..." : "Confirmar"}
-                </Btn>
-                <Btn variant="ghost" onClick={() => setDeleteConfirm(null)}>
-                  Cancelar
-                </Btn>
-              </div>
-            </motion.div>
-          </motion.div>
+          <ConfirmModal
+            title="Remover projeto?"
+            description="Esta ação fará commits no repositório removendo o projeto do arquivo JSON correspondente."
+            confirmLabel="Confirmar"
+            variant="danger"
+            saving={saving}
+            onConfirm={() => handleDelete(deleteConfirm)}
+            onCancel={() => setDeleteConfirm(null)}
+          />
         )}
       </AnimatePresence>
 
-      <AnimatePresence>{toast && <Toast msg={toast.msg} type={toast.type} />}</AnimatePresence>
-
+      {/* Modal: confirmar exclusão de ano */}
       <AnimatePresence>
         {yearToDelete && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center px-6"
-          >
-            <motion.div
-              initial={{ scale: 0.96, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.96, opacity: 0 }}
-              className="bg-white p-8 max-w-sm w-full"
-            >
-              <h3 className="text-lg font-light mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                Remover ano {yearToDelete}?
-              </h3>
-              <p className="text-sm text-stone-500 mb-6">
-                Todos os arquivos JSON deste ano serão removidos do repositório.
-              </p>
-              <div className="flex gap-3">
-                <Btn variant="danger" disabled={saving} onClick={() => handleDeleteYear(yearToDelete)}>
-                  {saving ? "Removendo..." : "Confirmar"}
-                </Btn>
-                <Btn variant="ghost" onClick={() => setYearToDelete(null)}>
-                  Cancelar
-                </Btn>
-              </div>
-            </motion.div>
-          </motion.div>
+          <ConfirmModal
+            title={`Remover ano ${yearToDelete}?`}
+            description="Todos os arquivos JSON deste ano serão removidos do repositório."
+            confirmLabel="Confirmar"
+            variant="danger"
+            saving={saving}
+            onConfirm={() => handleDeleteYear(yearToDelete)}
+            onCancel={() => setYearToDelete(null)}
+          />
         )}
       </AnimatePresence>
 
+      {/* Painel de auditoria */}
+      <AnimatePresence>
+        {showAuditLog && <AuditLogPanel onClose={() => setShowAuditLog(false)} />}
+      </AnimatePresence>
+
+      {/* Toast */}
+      <AnimatePresence>
+        {toast && <Toast msg={toast.msg} type={toast.type} />}
+      </AnimatePresence>
+
+      {/* FAB */}
       <button
         type="button"
         onClick={openNewProjectForm}
@@ -1188,6 +1759,7 @@ function Dashboard({ token, onLogout }) {
   );
 }
 
+// ─── ROOT ─────────────────────────────────────────────────────────────────────
 export default function AdminPage() {
   const [token, setToken] = useState(
     () => sessionStorage.getItem("gh_admin_token") || "",
