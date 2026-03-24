@@ -1,107 +1,106 @@
 {
-	"1": [
-		{
-			"id": "ling-01",
-			"tema": "Releitura da obra 'Operários' de Tarsila do Amaral",
-			"descricao": "Cada grupo deve criar uma releitura da obra Operários, refletindo uma visão contemporânea das questões sociais e laborais, incorporando elementos visuais modernos.",
-			"habilidades": [
-				"H16 - Relacionar práticas corporais e artísticas à própria vida, ao convívio social e à formação de identidades."
-			],
-			"imagens": [
-				"assets/images/2025/1tri/ling/Operarios.webp"
-			]
-		},
-		{
-			"id": "ling-02",
-			"tema": "Sistema Respiratório",
-			"descricao": "Produzir mapa mental contendo: função do sistema, órgãos do sistema com suas funções, controle da respiração e desenho dos movimentos respiratórios.",
-			"habilidades": [
-				"H10 - Construir as possibilidades e os limites das linguagens verbais, corporais e artísticas na criação e execução de projetos coletivos e ações colaborativas."
-			],
-			"imagens": [
-				"assets/images/2025/1tri/ling/SistemaRespiratorio.webp"
-			]
-		},
-		{
-			"id": "ling-03",
-			"tema": "Mapa Mental - Will x Going to",
-			"descricao": "Mapa mental com diferenças entre will e going to; formas negativas e interrogativas; exemplos e ilustrações.",
-			"habilidades": [
-				"H15 - Produzir trabalhos individuais e coletivos, explorando materiais e técnicas ligados ao universo das composições artísticas e de práticas corporais."
-			],
-			"imagens": [
-				"assets/images/2025/1tri/ling/Will-GoingTo.webp"
-			]
-		}
-	],
-	"2": [
-		{
-			"id": "ling-04",
-			"tema": "Guinness Records",
-			"descricao": "Atividade em grupo para preparar slides em inglês com recordes mundiais, utilizando superlativos e apresentação oral.",
-			"habilidades": [
-				"H15 - Produzir trabalhos individuais e coletivos, explorando materiais e técnicas artísticas."
-			],
-			"imagens": [
-				"assets/images/2025/2tri/ling/record-of-the-dogs/1.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/2.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/3.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/4.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/5.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/6.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/7.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/8.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/9.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/10.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/11.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/12.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/13.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/14.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/15.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/16.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/17.webp",
-				"assets/images/2025/2tri/ling/record-of-the-dogs/18.webp"
-			],
-			"link": "https://www.canva.com/design/DAGp9P9uNUQ/Dmxl_D5vp1exJA5PYSApCg/edit?utm_content=DAGp9P9uNUQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
-		},
-		{
-			"id": "ling-05",
-			"tema": "Paródia em quadrinhos: A linguagem visual na música",
-			"descricao": "Escrever uma paródia com figuras de linguagem e transformar em HQ com 8 a 10 quadrinhos, utilizando elementos visuais coerentes.",
-			"habilidades": [
-				"H15 - Produzir trabalhos artísticos.",
-				"HS14 - Comunicação por meio de plataformas multimídia."
-			],
-			"imagens": [
-				"assets/images/2025/2tri/ling/HQ.webp"
-			]
-		},
-		{
-			"id": "ling-06",
-			"tema": "Vida Saudável",
-			"descricao": "Escrever sua versão da música, garantindo o uso de figuras de linguagem. A paródia deve ser estruturada em pequenos trechos para facilitar a adaptação para um formato. Criar quadrinhos com imagens representando cada trecho da paródia. Utilizar folha A3, 8 a 10 quadrinhos. Incorporar balões de fala, expressões faciais e cenários que reforcem o significado das figuras de linguagem presentes no texto.",
-			"habilidades": [
-				"H15 - Produzir trabalhos individuais e coletivos, explorando materiais e técnicas ligados ao universo das composições artísticas e de práticas corporais.",
-				"HS14 - Comunicação por meio de plataformas multimídia analógicas e digitais, com conhecimento de meios diversos, como áudio, textos, imagens, gráficos e linguagens verbais, artísticas, científicas, matemáticas, cartográficas, corporais e multimodais, em diferentes contextos buscando adequação ao interlocutor."
-			],
-			"imagens": [
-				"assets/images/2025/2tri/ling/1000056080.webp"
-			]
-		}
-	],
-	"3": [
-		{
-			"id": "ling-07",
-			"tema": "Poster - Health and Medicine",
-			"descricao": "Criar um pôster em inglês destacando avanços na saúde e medicina.",
-			"habilidades": [
-				"C4 - Produzir textos orais e escritos, utilizando-os como meio de acesso e permanência no mundo do trabalho, respondendo aos diferentes propósitos da comunicação.",
-				"H24 - Produzir textos escritos de domínio acadêmico e educacional."
-			],
-			"imagens": [
-				"assets/images/2025/3tri/ling/health-medicine.webp"
-			]
-		}
-	]
+  "1": [
+    {
+      "id": "ling-01",
+      "tema": "Releitura da obra 'OperÃ¡rios' de Tarsila do Amaral",
+      "descricao": "Cada grupo deve criar uma releitura da obra OperÃ¡rios, refletindo uma visÃ£o contemporÃ¢nea das questÃµes sociais e laborais, incorporando elementos visuais modernos.",
+      "habilidades": [
+        "H16 - Relacionar prÃ¡ticas corporais e artÃ­sticas Ã  prÃ³pria vida, ao convÃ­vio social e Ã  formaÃ§Ã£o de identidades."
+      ],
+      "imagens": [
+        "assets/images/2025/1tri/ling/Operarios.webp"
+      ]
+    },
+    {
+      "id": "ling-02",
+      "tema": "Sistema RespiratÃ³rio",
+      "descricao": "Produzir mapa mental contendo: funÃ§Ã£o do sistema, Ã³rgÃ£os do sistema com suas funÃ§Ãµes, controle da respiraÃ§Ã£o e desenho dos movimentos respiratÃ³rios.",
+      "habilidades": [
+        "H10 - Construir as possibilidades e os limites das linguagens verbais, corporais e artÃ­sticas na criaÃ§Ã£o e execuÃ§Ã£o de projetos coletivos e aÃ§Ãµes colaborativas."
+      ],
+      "imagens": [
+        "assets/images/2025/1tri/ling/SistemaRespiratorio.webp"
+      ]
+    },
+    {
+      "id": "ling-03",
+      "tema": "Mapa Mental - Will x Going to",
+      "descricao": "Mapa mental com diferenÃ§as entre will e going to; formas negativas e interrogativas; exemplos e ilustraÃ§Ãµes.",
+      "habilidades": [
+        "H15 - Produzir trabalhos individuais e coletivos, explorando materiais e tÃ©cnicas ligados ao universo das composiÃ§Ãµes artÃ­sticas e de prÃ¡ticas corporais."
+      ],
+      "imagens": [
+        "assets/images/2025/1tri/ling/Will-GoingTo.webp"
+      ]
+    }
+  ],
+  "2": [
+    {
+      "id": "ling-04",
+      "tema": "Guinness Records",
+      "descricao": "Atividade em grupo para preparar slides em inglÃªs com recordes mundiais, utilizando superlativos e apresentaÃ§Ã£o oral.",
+      "habilidades": [
+        "H15 - Produzir trabalhos individuais e coletivos, explorando materiais e tÃ©cnicas artÃ­sticas."
+      ],
+      "imagens": [
+        "assets/images/2025/2tri/ling/record-of-the-dogs/1.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/2.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/3.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/4.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/5.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/6.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/7.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/8.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/9.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/10.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/11.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/12.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/13.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/14.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/15.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/16.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/17.webp",
+        "assets/images/2025/2tri/ling/record-of-the-dogs/18.webp"
+      ],
+      "link": "https://www.canva.com/design/DAGp9P9uNUQ/Dmxl_D5vp1exJA5PYSApCg/edit?utm_content=DAGp9P9uNUQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
+    },
+    {
+      "id": "ling-05",
+      "tema": "ParÃ³dia em quadrinhos: A linguagem visual na mÃºsica",
+      "descricao": "Escrever uma parÃ³dia com figuras de linguagem e transformar em HQ com 8 a 10 quadrinhos, utilizando elementos visuais coerentes.",
+      "habilidades": [
+        "H15 - Produzir trabalhos artÃ­sticos.",
+        "HS14 - ComunicaÃ§Ã£o por meio de plataformas multimÃ­dia."
+      ],
+      "imagens": [
+        "assets/images/2025/2tri/ling/HQ.webp"
+      ]
+    },
+    {
+      "id": "ling-06",
+      "tema": "Vida SaudÃ¡vel",
+      "descricao": "Escrever sua versÃ£o da mÃºsica, garantindo o uso de figuras de linguagem. A parÃ³dia deve ser estruturada em pequenos trechos para facilitar a adaptaÃ§Ã£o para um formato. Criar quadrinhos com imagens representando cada trecho da parÃ³dia. Utilizar folha A3, 8 a 10 quadrinhos. Incorporar balÃµes de fala, expressÃµes faciais e cenÃ¡rios que reforcem o significado das figuras de linguagem presentes no texto.",
+      "habilidades": [
+        "H15 - Produzir trabalhos individuais e coletivos, explorando materiais e tÃ©cnicas ligados ao universo das composiÃ§Ãµes artÃ­sticas e de prÃ¡ticas corporais.",
+        "HS14 - ComunicaÃ§Ã£o por meio de plataformas multimÃ­dia analÃ³gicas e digitais, com conhecimento de meios diversos, como Ã¡udio, textos, imagens, grÃ¡ficos e linguagens verbais, artÃ­sticas, cientÃ­ficas, matemÃ¡ticas, cartogrÃ¡ficas, corporais e multimodais, em diferentes contextos buscando adequaÃ§Ã£o ao interlocutor."
+      ],
+      "imagens": [
+        "assets/images/2025/2tri/ling/1000056080.webp"
+      ]
+    }
+  ],
+  "3": [
+    {
+      "id": "ling-07",
+      "tema": "Poster - Health and Medicine",
+      "descricao": "Criar um pÃ´ster em inglÃªs destacando avanÃ§os na saÃºde e medicina.",
+      "habilidades": [
+        "C4 - Produzir textos orais e escritos, utilizando-os como meio de acesso e permanÃªncia no mundo do trabalho, respondendo aos diferentes propÃ³sitos da comunicaÃ§Ã£o.",
+        "H24 - Produzir textos escritos de domÃ­nio acadÃªmico e educacional."
+      ],
+      "imagens": [
+        "assets/images/2025/3tri/ling/health-medicine.webp"
+      ]
+    }
+  ]
 }
-
