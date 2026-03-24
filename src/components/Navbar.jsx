@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getCategories } from '../data/portfolio';
+import YearSwitch from './YearSwitch';
 
 /**
  * Navbar Component - ZARA-Inspired Minimal Fullscreen Menu
@@ -185,8 +186,9 @@ const Navbar = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.6, duration: 0.8 }}
-                  className="mt-24"
+                  className="mt-24 flex items-center justify-start"
                 >
+                  <YearSwitch size="compact" />
                 </motion.div>
               </div>
             </div>
