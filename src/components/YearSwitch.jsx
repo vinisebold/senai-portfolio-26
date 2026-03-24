@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getAvailableYears } from '../data/portfolio';
 
 const years = getAvailableYears();
@@ -18,12 +18,31 @@ const sizeMap = {
 
 const YearSwitch = ({ size = 'large', className = '' }) => {
   const [hoveredYear, setHoveredYear] = useState(null);
+  const [slotPositions, setSlotPositions] = useState([0, 0, 0]);
   const [firstYear, secondYear] = years;
   const currentSize = sizeMap[size] || sizeMap.large;
+  const leftSlotRef = useRef(null);
+  const middleSlotRef = useRef(null);
+  const rightSlotRef = useRef(null);
 
-  const showLeftBar = hoveredYear === null || hoveredYear === firstYear;
-  const showMiddleBar = hoveredYear !== null;
-  const showRightBar = hoveredYear === null || hoveredYear === secondYear;
+  useEffect(() => {
+    const measureSlots = () => {
+      const left = leftSlotRef.current?.offsetLeft ?? 0;
+      const middle = middleSlotRef.current?.offsetLeft ?? 0;
+      const right = rightSlotRef.current?.offsetLeft ?? 0;
+      setSlotPositions([left, middle, right]);
+    };
+
+    measureSlots();
+    window.addEventListener('resize', measureSlots);
+
+    return () => {
+      window.removeEventListener('resize', measureSlots);
+    };
+  }, [size, firstYear, secondYear]);
+
+  const targetSlots =
+    hoveredYear === firstYear ? [0, 1] : hoveredYear === secondYear ? [1, 2] : [0, 2];
 
   const yearClassName = `${currentSize.year} transition-opacity duration-300 hover:opacity-60`;
 
@@ -41,14 +60,19 @@ const YearSwitch = ({ size = 'large', className = '' }) => {
 
   return (
     <div
-      className={`flex items-center justify-center ${className}`}
+      className={`relative flex items-center justify-center ${className}`}
       onMouseLeave={() => setHoveredYear(null)}
     >
+      <span ref={leftSlotRef} aria-hidden="true" className={`${currentSize.bar} opacity-0 select-none`}>
+        |
+      </span>
+
       <motion.span
         aria-hidden="true"
         className={currentSize.bar}
-        animate={{ opacity: showLeftBar ? 1 : 0 }}
-        transition={{ duration: 0.25, ease: 'easeOut' }}
+        style={{ position: 'absolute', left: 0, pointerEvents: 'none' }}
+        animate={{ x: slotPositions[targetSlots[0]] }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       >
         |
       </motion.span>
@@ -63,14 +87,9 @@ const YearSwitch = ({ size = 'large', className = '' }) => {
         {firstYear}
       </Link>
 
-      <motion.span
-        aria-hidden="true"
-        className={currentSize.bar}
-        animate={{ opacity: showMiddleBar ? 1 : 0 }}
-        transition={{ duration: 0.25, ease: 'easeOut' }}
-      >
+      <span ref={middleSlotRef} aria-hidden="true" className={`${currentSize.bar} opacity-0 select-none`}>
         |
-      </motion.span>
+      </span>
 
       <Link
         to={`/${secondYear}`}
@@ -82,11 +101,16 @@ const YearSwitch = ({ size = 'large', className = '' }) => {
         {secondYear}
       </Link>
 
+      <span ref={rightSlotRef} aria-hidden="true" className={`${currentSize.bar} opacity-0 select-none`}>
+        |
+      </span>
+
       <motion.span
         aria-hidden="true"
         className={currentSize.bar}
-        animate={{ opacity: showRightBar ? 1 : 0 }}
-        transition={{ duration: 0.25, ease: 'easeOut' }}
+        style={{ position: 'absolute', left: 0, pointerEvents: 'none' }}
+        animate={{ x: slotPositions[targetSlots[1]] }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       >
         |
       </motion.span>
