@@ -18,14 +18,16 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const location = useLocation();
-  const categories = getCategories();
+  const [_, yearFromPath] = location.pathname.split('/');
+  const activeYear = yearFromPath || '2025';
+  const categories = getCategories(activeYear);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
     if (menuOpen) {
       document.body.classList.add('menu-open');
       // Set active category when menu opens
-      if (location.pathname === '/') {
+      if (location.pathname === `/${activeYear}`) {
         setSelectedCategory('home');
       } else {
         const activeCategory = categories.find(cat => isCategoryActive(cat.slug));
@@ -38,27 +40,14 @@ const Navbar = () => {
     }
 
     return () => document.body.classList.remove('menu-open');
-  }, [menuOpen, location.pathname]);
+  }, [menuOpen, location.pathname, activeYear, categories]);
 
   // Determine if a category is active based on current route
-  const isCategoryActive = (slug) => location.pathname.includes(slug);
+  const isCategoryActive = (slug) => location.pathname.includes(`/${slug}/`);
 
   const closeMenu = () => {
     setMenuOpen(false);
     setSelectedCategory(null);
-  };
-
-  // Calculate dot position based on selected category
-  const calculateDotPosition = (slug) => {
-    // If home, position at first item (Vinícius Sebold)
-    if (slug === 'home') {
-      return 0;
-    }
-    const idx = categories.findIndex(cat => cat.slug === slug);
-    // Each item has 2px gap (space-y-2) + approximately 36px height for 28px font
-    // Starting position after "Vinícius Sebold" which is first item
-    const baseOffset = 36; // Offset after "Vinícius Sebold" item
-    return baseOffset + (idx * 38); // 38px = gap + item height
   };
 
   return (
@@ -126,7 +115,7 @@ const Navbar = () => {
                         className="w-1 h-1.5 bg-black flex-shrink-0"
                       />
                       <Link
-                        to="/"
+                        to={`/${activeYear}`}
                         className="inline-block font-lora text-[28px] font-medium uppercase hover:opacity-60 transition-opacity"
                         onClick={closeMenu}
                       >
@@ -135,7 +124,7 @@ const Navbar = () => {
                     </div>
 
                     {/* Category sections */}
-                    {categories.map((cat, idx) => (
+                    {categories.map((cat) => (
                       <div
                         key={cat.slug}
                         className="flex items-center gap-4"
@@ -175,9 +164,9 @@ const Navbar = () => {
                           {[1, 2, 3].map((num) => (
                             <div key={num}>
                               <Link
-                                to={`/${cat.slug}/${num}-trimestre`}
+                                to={`/${activeYear}/${cat.slug}/${num}-trimestre`}
                                 className={`font-roboto text-[15px] uppercase opacity-90 hover:opacity-100 transition-opacity block ${
-                                  location.pathname === `/${cat.slug}/${num}-trimestre` ? 'font-medium' : 'font-light'
+                                  location.pathname === `/${activeYear}/${cat.slug}/${num}-trimestre` ? 'font-medium' : 'font-light'
                                 }`}
                                 onClick={closeMenu}
                               >

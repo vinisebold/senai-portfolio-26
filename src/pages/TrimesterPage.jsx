@@ -1,6 +1,6 @@
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { getCategoryBySlug, getTrimester } from '../data/portfolio';
+import { getCategoryBySlug, getTrimester, isValidYear } from '../data/portfolio';
 import PageHeader from '../components/PageHeader';
 import Card from '../components/Card';
 
@@ -17,18 +17,22 @@ import Card from '../components/Card';
  */
 
 const TrimesterPage = () => {
-  const { categorySlug, trimesterNumber } = useParams();
+  const { year, categorySlug, trimesterNumber } = useParams();
+
+  if (!isValidYear(year)) {
+    return <Navigate to="/" replace />;
+  }
 
   // Parse trimester number from URL (format: "1-trimestre" -> 1)
   const numero = parseInt(trimesterNumber.split('-')[0]);
 
   // Fetch data
-  const category = getCategoryBySlug(categorySlug);
-  const trimester = getTrimester(categorySlug, numero);
+  const category = getCategoryBySlug(year, categorySlug);
+  const trimester = getTrimester(year, categorySlug, numero);
 
   // Handle 404: category or trimester not found
   if (!category || !trimester) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={`/${year}`} replace />;
   }
 
   return (
@@ -42,7 +46,7 @@ const TrimesterPage = () => {
           {[1, 2, 3].map((num) => (
             <Link
               key={num}
-              to={`/${categorySlug}/${num}-trimestre`}
+              to={`/${year}/${categorySlug}/${num}-trimestre`}
               className={`font-roboto text-[13px] uppercase opacity-90 hover:opacity-100 transition-opacity block ${
                 numero === num ? 'font-medium opacity-100' : 'font-light'
               }`}

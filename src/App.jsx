@@ -3,6 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import TrimesterPage from './pages/TrimesterPage';
+import YearSelector from './pages/YearSelector';
 
 /**
  * AnimatedRoutes - Wrapper for page transitions
@@ -14,10 +15,23 @@ const AnimatedRoutes = () => {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Home />} />
-        <Route path="/:categorySlug/:trimesterNumber" element={<TrimesterPage />} />
+        <Route path="/" element={<YearSelector />} />
+        <Route path="/:year" element={<Home />} />
+        <Route path="/:year/:categorySlug/:trimesterNumber" element={<TrimesterPage />} />
       </Routes>
     </AnimatePresence>
+  );
+};
+
+const AppLayout = () => {
+  const location = useLocation();
+  const showNavbar = location.pathname !== '/';
+
+  return (
+    <div className="min-h-screen bg-white">
+      {showNavbar && <Navbar />}
+      <AnimatedRoutes />
+    </div>
   );
 };
 
@@ -33,10 +47,7 @@ const AnimatedRoutes = () => {
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-white">
-        <Navbar />
-        <AnimatedRoutes />
-      </div>
+      <AppLayout />
     </Router>
   );
 }

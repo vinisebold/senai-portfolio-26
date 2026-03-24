@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
+import { Link, useParams, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { getCategories, getWorksCountByCategory } from '../data/portfolio';
+import { getCategories, getWorksCountByCategory, isValidYear } from '../data/portfolio';
 
 /**
  * Home Page - Editorial Cover
@@ -15,7 +15,13 @@ import { getCategories, getWorksCountByCategory } from '../data/portfolio';
  */
 
 const Home = () => {
-  const categories = getCategories();
+  const { year } = useParams();
+
+  if (!isValidYear(year)) {
+    return <Navigate to="/" replace />;
+  }
+
+  const categories = getCategories(year);
 
   return (
     <motion.div
@@ -36,7 +42,7 @@ const Home = () => {
 
         {/* Subtitle */}
         <p className="nav-link opacity-60 mb-16">
-          PORTFÓLIO ESCOLAR — 2026
+          PORTFÓLIO ESCOLAR — {year}
         </p>
       </section>
 
@@ -50,13 +56,13 @@ const Home = () => {
 
           {/* Category grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-20">
-            {categories.map((cat, index) => {
-              const workCount = getWorksCountByCategory(cat.slug);
+            {categories.map((cat) => {
+              const workCount = getWorksCountByCategory(year, cat.slug);
 
               return (
                 <Link
                   key={cat.slug}
-                  to={`/${cat.slug}/1-trimestre`}
+                  to={`/${year}/${cat.slug}/1-trimestre`}
                   className="group"
                 >
                   <article className="border-t border-black pt-6 transition-opacity hover:opacity-60">
@@ -82,7 +88,7 @@ const Home = () => {
       <footer className="px-6 md:px-section py-12 border-t border-black">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="nav-link opacity-40">
-            © 2026 VINÍCIUS SEBOLD
+            © {year} VINÍCIUS SEBOLD
           </p>
           <p className="nav-link opacity-40">
             SENAI — ENSINO MÉDIO
