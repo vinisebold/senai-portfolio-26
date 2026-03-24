@@ -967,7 +967,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
 
     const ext = file.name.split(".").pop();
     const fileName = `${form.id}_${Date.now()}.${ext}`;
-    const path = `assets/images/${form.year}/${form.trimester}tri/${form.categorySlug}/uploads/${fileName}`;
+        const path = `assets/images/${form.year}/${form.trimester}/${form.categorySlug}/uploads/${fileName}`;
 
     // Verifica se já existe imagem com o mesmo nome no form
     const alreadyExists = form.images.some((img) => img.includes(fileName));
