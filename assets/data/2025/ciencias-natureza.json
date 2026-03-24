@@ -5,7 +5,7 @@
       "tema": "Alavanca Romana",
       "descricao": "Montar uma alavanca romana e anexar foto como estudante.",
       "habilidades": [
-        "H6 - Compreender os conceitos relacionados Ã  FÃ­sica em seus diferentes ramos: Astronomia, MecÃ¢nica, AcÃºstica, Ãptica, Termologia, Calorimetria, OndulatÃ³ria, Eletricidade, Magnetismo e FÃ­sica Moderna e Nuclear."
+        "H6 - Compreender os conceitos relacionados ÃÂ  FÃÂ­sica em seus diferentes ramos: Astronomia, MecÃÂ¢nica, AcÃÂºstica, ÃÂptica, Termologia, Calorimetria, OndulatÃÂ³ria, Eletricidade, Magnetismo e FÃÂ­sica Moderna e Nuclear."
       ],
       "imagens": [
         "assets/images/2025/1tri/cn/Alavanca-Romana.webp"
@@ -14,9 +14,9 @@
     {
       "id": "cn-02",
       "tema": "Alavanca Romana - Experimento",
-      "descricao": "Registro em imagens do experimento de alavancas, destacando vantagem mecÃ¢nica e torque.",
+      "descricao": "Registro em imagens do experimento de alavancas, destacando vantagem mecÃÂ¢nica e torque.",
       "habilidades": [
-        "H6 - Compreender os conceitos relacionados Ã  FÃ­sica em seus diferentes ramos: Astronomia, MecÃ¢nica, AcÃºstica, Ãptica, Termologia, Calorimetria, OndulatÃ³ria, Eletricidade, Magnetismo e FÃ­sica Moderna e Nuclear."
+        "H6 - Compreender os conceitos relacionados ÃÂ  FÃÂ­sica em seus diferentes ramos: Astronomia, MecÃÂ¢nica, AcÃÂºstica, ÃÂptica, Termologia, Calorimetria, OndulatÃÂ³ria, Eletricidade, Magnetismo e FÃÂ­sica Moderna e Nuclear."
       ],
       "imagens": [
         "assets/images/2025/1tri/cn/fisica-1.webp",
@@ -27,10 +27,10 @@
   "2": [
     {
       "id": "cn-03",
-      "tema": "Sistema circulatÃ³rio",
-      "descricao": "Foto do trabalho do sistema circulatÃ³rio.",
+      "tema": "Sistema circulatÃÂ³rio",
+      "descricao": "Foto do trabalho do sistema circulatÃÂ³rio.",
       "habilidades": [
-        "H23 - Formular propostas de alcance individual ou coletivo, utilizando como critÃ©rios a preservaÃ§Ã£o e a promoÃ§Ã£o da saÃºde individual e coletiva."
+        "H23 - Formular propostas de alcance individual ou coletivo, utilizando como critÃÂ©rios a preservaÃÂ§ÃÂ£o e a promoÃÂ§ÃÂ£o da saÃÂºde individual e coletiva."
       ],
       "imagens": [
         "assets/images/2025/2tri/cn/biocard.webp"
@@ -41,7 +41,7 @@
       "tema": "Tecidos animais e vegetais",
       "descricao": "Slides dos tecidos animais ou vegetais.",
       "habilidades": [
-        "H21 - Conhecer as caracterÃ­sticas do sistema nervoso e seu papel na coordenaÃ§Ã£o das aÃ§Ãµes motoras e sensoriais do corpo, com base na anÃ¡lise de suas estruturas bÃ¡sicas."
+        "H21 - Conhecer as caracterÃÂ­sticas do sistema nervoso e seu papel na coordenaÃÂ§ÃÂ£o das aÃÂ§ÃÂµes motoras e sensoriais do corpo, com base na anÃÂ¡lise de suas estruturas bÃÂ¡sicas."
       ],
       "imagens": [
         "assets/images/2025/2tri/cn/slides/1.webp",
@@ -56,10 +56,10 @@
     },
     {
       "id": "cn-05",
-      "tema": "HidroestÃ¡tica",
-      "descricao": "Estudo sobre hidroestÃ¡tica e suas aplicaÃ§Ãµes prÃ¡ticas.",
+      "tema": "HidroestÃÂ¡tica",
+      "descricao": "Estudo sobre hidroestÃÂ¡tica e suas aplicaÃÂ§ÃÂµes prÃÂ¡ticas.",
       "habilidades": [
-        "H6 - Compreender os conceitos relacionados Ã  FÃ­sica em seus diferentes ramos."
+        "H6 - Compreender os conceitos relacionados ÃÂ  FÃÂ­sica em seus diferentes ramos."
       ],
       "imagens": [
         "assets/images/2025/2tri/cn/hidroestatica.webp"
@@ -72,8 +72,8 @@
       "tema": "Tabela Animais",
       "descricao": "LINK da Tabela de Animais",
       "habilidades": [
-        "C2 - Aplicar os conceitos fundamentais e estruturas procedimentais das CiÃªncias da Natureza na explicaÃ§Ã£o de fenÃ´menos cotidianos, bem como dominar processos e prÃ¡ticas da investigaÃ§Ã£o cientÃ­fica.",
-        "H8 - Compreender os conceitos relacionados Ã  Biologia nos seus diferentes ramos: Zoologia, BotÃ¢nica, Ecologia e GenÃ©tica."
+        "C2 - Aplicar os conceitos fundamentais e estruturas procedimentais das CiÃÂªncias da Natureza na explicaÃÂ§ÃÂ£o de fenÃÂ´menos cotidianos, bem como dominar processos e prÃÂ¡ticas da investigaÃÂ§ÃÂ£o cientÃÂ­fica.",
+        "H8 - Compreender os conceitos relacionados ÃÂ  Biologia nos seus diferentes ramos: Zoologia, BotÃÂ¢nica, Ecologia e GenÃÂ©tica."
       ],
       "imagens": [
         "assets/images/2025/3tri/cn/tabela-animais.webp"
@@ -82,11 +82,11 @@
     },
     {
       "id": "cn-07",
-      "tema": "ATIVIDADE EXPERIMENTAL: NÃºmero de OxidaÃ§Ã£o: ReaÃ§Ã£o de reduÃ§Ã£o do manganÃªs.",
-      "descricao": "Fotos do RelatÃ³rio e Fotos/VÃ­deo da atividade experimental- NÃºmero de OxidaÃ§Ã£o: ReaÃ§Ã£o de reduÃ§Ã£o do manganÃªs.",
+      "tema": "ATIVIDADE EXPERIMENTAL: NÃÂºmero de OxidaÃÂ§ÃÂ£o: ReaÃÂ§ÃÂ£o de reduÃÂ§ÃÂ£o do manganÃÂªs.",
+      "descricao": "Fotos do RelatÃÂ³rio e Fotos/VÃÂ­deo da atividade experimental- NÃÂºmero de OxidaÃÂ§ÃÂ£o: ReaÃÂ§ÃÂ£o de reduÃÂ§ÃÂ£o do manganÃÂªs.",
       "habilidades": [
-        "C2 - Aplicar os conceitos fundamentais e estruturas procedimentais das CiÃªncias da Natureza na explicaÃ§Ã£o de fenÃ´menos cotidianos, bem como dominar processos e prÃ¡ticas da investigaÃ§Ã£o cientÃ­fica.",
-        "H9 - Explicar os conceitos de energia, matÃ©ria, vida e transformaÃ§Ã£o para explicar fenÃ´menos naturais e procedimentos tecnolÃ³gicos."
+        "C2 - Aplicar os conceitos fundamentais e estruturas procedimentais das CiÃÂªncias da Natureza na explicaÃÂ§ÃÂ£o de fenÃÂ´menos cotidianos, bem como dominar processos e prÃÂ¡ticas da investigaÃÂ§ÃÂ£o cientÃÂ­fica.",
+        "H9 - Explicar os conceitos de energia, matÃÂ©ria, vida e transformaÃÂ§ÃÂ£o para explicar fenÃÂ´menos naturais e procedimentos tecnolÃÂ³gicos."
       ],
       "imagens": [
         "assets/images/2025/3tri/cn/manganes/1.webp",
@@ -96,11 +96,11 @@
     },
     {
       "id": "cn-08",
-      "tema": "Mapa Mental PILHAS - EletroquÃ­mica",
-      "descricao": "Construir um mapa mental sobre pilhas e eletroquÃ­mica.",
+      "tema": "Mapa Mental PILHAS - EletroquÃÂ­mica",
+      "descricao": "Construir um mapa mental sobre pilhas e eletroquÃÂ­mica.",
       "habilidades": [
-        "C2 - Aplicar os conceitos fundamentais e estruturas procedimentais das CiÃªncias da Natureza na explicaÃ§Ã£o de fenÃ´menos cotidianos, bem como dominar processos e prÃ¡ticas da investigaÃ§Ã£o cientÃ­fica.",
-        "H9 - Explicar os conceitos de energia, matÃ©ria, vida e transformaÃ§Ã£o para explicar fenÃ´menos naturais e procedimentos tecnolÃ³gicos."
+        "C2 - Aplicar os conceitos fundamentais e estruturas procedimentais das CiÃÂªncias da Natureza na explicaÃÂ§ÃÂ£o de fenÃÂ´menos cotidianos, bem como dominar processos e prÃÂ¡ticas da investigaÃÂ§ÃÂ£o cientÃÂ­fica.",
+        "H9 - Explicar os conceitos de energia, matÃÂ©ria, vida e transformaÃÂ§ÃÂ£o para explicar fenÃÂ´menos naturais e procedimentos tecnolÃÂ³gicos."
       ],
       "imagens": [
         "assets/images/2025/3tri/cn/mapa-mental-pilhas.webp"
