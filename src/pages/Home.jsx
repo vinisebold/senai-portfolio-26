@@ -62,7 +62,7 @@ const Home = () => {
               return (
                 <Link
                   key={cat.slug}
-                  to={`/${year}/${cat.slug}/1-trimestre`}
+                  to={`/${year}/${cat.slug}/1`}
                   className="group"
                 >
                   <article className="border-t border-black pt-6 transition-opacity hover:opacity-60">

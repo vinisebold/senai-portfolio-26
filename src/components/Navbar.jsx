@@ -165,9 +165,9 @@ const Navbar = () => {
                           {[1, 2, 3].map((num) => (
                             <div key={num}>
                               <Link
-                                to={`/${activeYear}/${cat.slug}/${num}-trimestre`}
+                                to={`/${activeYear}/${cat.slug}/${num}`}
                                 className={`font-roboto text-[15px] uppercase opacity-90 hover:opacity-100 transition-opacity block ${
-                                  location.pathname === `/${activeYear}/${cat.slug}/${num}-trimestre` ? 'font-medium' : 'font-light'
+                                  location.pathname === `/${activeYear}/${cat.slug}/${num}` ? 'font-medium' : 'font-light'
                                 }`}
                                 onClick={closeMenu}
                               >

@@ -23,8 +23,8 @@ const TrimesterPage = () => {
     return <Navigate to="/" replace />;
   }
 
-  // Parse trimester number from URL (format: "1-trimestre" -> 1)
-  const numero = parseInt(trimesterNumber.split('-')[0]);
+  // Parse trimester number from URL (format: "1", "2", "3")
+  const numero = parseInt(trimesterNumber);
 
   // Fetch data
   const category = getCategoryBySlug(year, categorySlug);
@@ -46,7 +46,7 @@ const TrimesterPage = () => {
           {[1, 2, 3].map((num) => (
             <Link
               key={num}
-              to={`/${year}/${categorySlug}/${num}-trimestre`}
+              to={`/${year}/${categorySlug}/${num}`}
               className={`font-roboto text-[13px] uppercase opacity-90 hover:opacity-100 transition-opacity block ${
                 numero === num ? 'font-medium opacity-100' : 'font-light'
               }`}
