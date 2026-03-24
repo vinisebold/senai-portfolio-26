@@ -1512,7 +1512,7 @@ function Dashboard({ token, onLogout }) {
   }
 
   function openNewProjectForm() {
-    const year = filterYear !== "all" ? filterYear : years[0];
+    const year = years[years.length - 1];
     const category = filterCat !== "all" ? filterCat : CATEGORY_META[0].slug;
     setEditing(buildEmptyProject(year, category));
   }
