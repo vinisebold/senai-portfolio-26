@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getCategories } from '../data/portfolio';
 import YearSwitch from './YearSwitch';
@@ -18,14 +18,7 @@ import YearSwitch from './YearSwitch';
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [isHoldingName, setIsHoldingName] = useState(false);
-  const [holdProgress, setHoldProgress] = useState(0);
-  
-  const holdTimerRef = useRef(null);
-  const progressIntervalRef = useRef(null);
-  
   const location = useLocation();
-  const navigate = useNavigate();
   const [_, yearFromPath] = location.pathname.split('/');
   const activeYear = yearFromPath || '2025';
   const categories = getCategories(activeYear);
@@ -56,43 +49,6 @@ const Navbar = () => {
   const closeMenu = () => {
     setMenuOpen(false);
     setSelectedCategory(null);
-  };
-
-  const handleNamePressStart = (e) => {
-    e.preventDefault();
-    setIsHoldingName(true);
-    setHoldProgress(0);
-    
-    // Iniciar o timer de 3 segundos
-    let elapsed = 0;
-    const intervalStep = 50; // atualizar a cada 50ms
-    
-    progressIntervalRef.current = setInterval(() => {
-      elapsed += intervalStep;
-      setHoldProgress((elapsed / 3000) * 100);
-    }, intervalStep);
-    
-    holdTimerRef.current = setTimeout(() => {
-      // Completou 3 segundos - navegar para admin
-      clearInterval(progressIntervalRef.current);
-      navigate('/admin');
-      closeMenu();
-      setIsHoldingName(false);
-      setHoldProgress(0);
-    }, 3000);
-  };
-
-  const handleNamePressEnd = () => {
-    setIsHoldingName(false);
-    setHoldProgress(0);
-    if (holdTimerRef.current) {
-      clearTimeout(holdTimerRef.current);
-      holdTimerRef.current = null;
-    }
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-      progressIntervalRef.current = null;
-    }
   };
 
   return (
@@ -159,35 +115,13 @@ const Navbar = () => {
                         transition={{ duration: 0.3, ease: [0.43, 0.13, 0.23, 0.96] }}
                         className="w-1 h-1.5 bg-black flex-shrink-0"
                       />
-                      <div 
-                        className="relative"
-                        onPointerDown={handleNamePressStart}
-                        onPointerUp={handleNamePressEnd}
-                        onPointerLeave={handleNamePressEnd}
-                        onPointerCancel={handleNamePressEnd}
+                      <Link
+                        to={`/${activeYear}`}
+                        className="inline-block font-lora text-[28px] font-medium uppercase hover:opacity-60 transition-opacity"
+                        onClick={closeMenu}
                       >
-                        {/* Progress bar background */}
-                        <div 
-                          className="absolute inset-0 bg-red-500/20 pointer-events-none transition-all duration-75"
-                          style={{ 
-                            opacity: holdProgress / 100,
-                            transform: `scaleX(${holdProgress / 100})`,
-                            transformOrigin: 'left'
-                          }}
-                        />
-                        
-                        {/* Nome com opacidade baseada no progresso */}
-                        <Link
-                          to={`/${activeYear}`}
-                          className="inline-block font-lora text-[28px] font-medium uppercase hover:opacity-60 transition-opacity relative z-10"
-                          style={{ 
-                            opacity: 1 - (holdProgress / 100)
-                          }}
-                          onClick={closeMenu}
-                        >
-                          Vinícius Sebold
-                        </Link>
-                      </div>
+                        Vinícius Sebold
+                      </Link>
                     </div>
 
                     {/* Category sections */}
