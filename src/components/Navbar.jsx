@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getCategories } from '../data/portfolio';
 import YearSwitch from './YearSwitch';
@@ -15,13 +15,15 @@ import YearSwitch from './YearSwitch';
  * - Clean typography with generous spacing
  */
 
-const Navbar = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const location = useLocation();
-  const [_, yearFromPath] = location.pathname.split('/');
-  const activeYear = yearFromPath || '2025';
-  const categories = getCategories(activeYear);
+  const Navbar = () => {
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [holdTimer, setHoldTimer] = useState(null);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const [_, yearFromPath] = location.pathname.split('/');
+    const activeYear = yearFromPath || '2025';
+    const categories = getCategories(activeYear);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -105,16 +107,40 @@ const Navbar = () => {
                 <div className="flex gap-20 md:gap-32">
                   {/* Left column: Main navigation */}
                   <nav className="space-y-2 flex-shrink-0">
-                    {/* Home link - Vinicius Sebold */}
-                    <div className="flex items-center gap-4">
-                      <motion.div
-                        animate={{
-                          scale: selectedCategory === 'home' ? 1 : 0,
-                          opacity: selectedCategory === 'home' ? 1 : 0
-                        }}
-                        transition={{ duration: 0.3, ease: [0.43, 0.13, 0.23, 0.96] }}
-                        className="w-1 h-1.5 bg-black flex-shrink-0"
-                      />
+                  {/* Home link - Vinicius Sebold */}
+                  <div className="flex items-center gap-4">
+                    <motion.div
+                      animate={{
+                        scale: selectedCategory === 'home' ? 1 : 0,
+                        opacity: selectedCategory === 'home' ? 1 : 0
+                      }}
+                      transition={{ duration: 0.3, ease: [0.43, 0.13, 0.23, 0.96] }}
+                      className="w-1 h-1.5 bg-black flex-shrink-0"
+                    />
+                    <motion.div
+                      whileTap={{
+                        onTapStart: () => {
+                          setHoldTimer(setTimeout(() => {
+                            navigate('/admin');
+                            closeMenu();
+                          }, 3000));
+                        },
+                        onTapEnd: () => {
+                          if (holdTimer) {
+                            clearTimeout(holdTimer);
+                            setHoldTimer(null);
+                          }
+                        },
+                        onTapCancel: () => {
+                          if (holdTimer) {
+                            clearTimeout(holdTimer);
+                            setHoldTimer(null);
+                          }
+                        }
+                      }}
+                      animate={{ opacity: holdTimer === null ? 1 : 0 }}
+                      transition={{ duration: 3 }}
+                    >
                       <Link
                         to={`/${activeYear}`}
                         className="inline-block font-lora text-[28px] font-medium uppercase hover:opacity-60 transition-opacity"
@@ -122,7 +148,8 @@ const Navbar = () => {
                       >
                         Vinícius Sebold
                       </Link>
-                    </div>
+                    </motion.div>
+                  </div>
 
                     {/* Category sections */}
                     {categories.map((cat) => (
