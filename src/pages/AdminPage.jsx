@@ -471,13 +471,21 @@ function buildEmptyProject(defaultYear, defaultCategory = CATEGORY_META[0].slug)
 // ─── IMAGE COM FALLBACK ───────────────────────────────────────────────────────
 // Mostra skeleton durante carregamento e um estado visual de "não encontrada"
 // sem recorrer a serviços externos (sem picsum, sem placeholder.com etc.).
+const CORS_PROXY = "https://corsproxy.io/?";
+
 function ProjectImage({ src, alt = "", className = "", numberLabel }) {
   const [status, setStatus] = useState("loading"); // "loading" | "ok" | "broken"
+  const [proxySrc, setProxySrc] = useState("");
 
-  // Reinicia estado quando a src muda (troca de imagem)
   useEffect(() => {
     if (!src) { setStatus("broken"); return; }
     setStatus("loading");
+    // Adiciona proxy CORS para imagens do GitHub em produção
+    if (src.includes("github.com")) {
+      setProxySrc(CORS_PROXY + encodeURIComponent(src));
+    } else {
+      setProxySrc(src);
+    }
   }, [src]);
 
   const filename = src ? src.split("/").pop() : "";
@@ -490,9 +498,9 @@ function ProjectImage({ src, alt = "", className = "", numberLabel }) {
       )}
 
       {/* Imagem real */}
-      {src && (
+      {proxySrc && (
         <img
-          src={src}
+          src={proxySrc}
           alt={alt}
           className={`w-full h-full object-cover transition-opacity duration-300 ${
             status === "ok" ? "opacity-100" : "opacity-0 absolute inset-0"
