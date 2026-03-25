@@ -442,7 +442,7 @@ async function uploadImage(token, file, path, onAttempt = null) {
 
         appendAuditLog({ action: sha ? "update-image" : "create-image", path });
         resolve(
-          `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${path}`,
+          `https://github.com/${REPO_OWNER}/${REPO_NAME}/raw/${BRANCH}/${path}`,
         );
       } catch (error) {
         reject(error);
