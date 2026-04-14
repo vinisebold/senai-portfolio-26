@@ -3,7 +3,7 @@ const dataModules = import.meta.glob('../../assets/data/*/*.json', {
   import: 'default',
 });
 
-const imageModules = import.meta.glob('../../assets/images/**/*.{webp,png,jpg,jpeg,avif}', {
+const imageModules = import.meta.glob('../../assets/images/**/*.{webp,png,jpg,jpeg,avif,gif,mp4,webm,ogg,mov}', {
   eager: true,
   import: 'default',
 });
@@ -51,9 +51,17 @@ const resolveImageSrc = (imagePath) => {
   return imageModules[key] || `/${imagePath}`;
 };
 
+const getMediaTypeFromPath = (path) => {
+  if (!path) return 'image';
+  const cleanPath = path.split('?')[0].toLowerCase();
+  if (/\.(mp4|webm|ogg|mov)$/i.test(cleanPath)) return 'video';
+  return 'image';
+};
+
 const toImageObject = (imagePath, trabalhoTema, index) => ({
   src: resolveImageSrc(imagePath),
-  alt: `${trabalhoTema} - imagem ${index + 1}`,
+  alt: `${trabalhoTema} - mídia ${index + 1}`,
+  type: getMediaTypeFromPath(imagePath),
 });
 
 const normalizeTrabalho = (trabalho) => ({
