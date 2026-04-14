@@ -40,11 +40,10 @@ const Carousel = ({ images }) => {
     emblaApi.on('reInit', onSelect);
   }, [emblaApi, onSelect]);
 
-  const renderMedia = (media, index) => {
+  const renderMedia = (media) => {
     if (media?.type === 'video') {
       return (
         <video
-          key={`video-${index}`}
           src={media.src}
           className="w-full h-full object-cover bg-stone"
           controls
@@ -57,7 +56,6 @@ const Carousel = ({ images }) => {
 
     return (
       <img
-        key={`image-${index}`}
         src={media.src}
         alt={media.alt}
         className="w-full h-full object-cover bg-stone"
@@ -69,7 +67,7 @@ const Carousel = ({ images }) => {
   if (images.length === 1) {
     return (
       <div className="relative w-full h-[480px] bg-stone">
-        {renderMedia(images[0], 0)}
+        {renderMedia(images[0])}
       </div>
     );
   }
@@ -80,8 +78,8 @@ const Carousel = ({ images }) => {
       <div className="overflow-hidden h-full" ref={emblaRef}>
         <div className="flex h-full">
           {images.map((image, index) => (
-            <div key={index} className="flex-[0_0_100%] min-w-0 relative">
-              {renderMedia(image, index)}
+            <div key={`${image.src}-${index}`} className="flex-[0_0_100%] min-w-0 relative">
+              {renderMedia(image)}
             </div>
           ))}
         </div>

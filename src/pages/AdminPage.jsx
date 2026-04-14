@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const REPO_OWNER = "vinisebold";
@@ -38,7 +38,7 @@ const TRIMESTER_LABELS = {
 // Try to resolve bundled asset paths to their final (hashed) URLs at build time.
 // This mirrors the logic used by the public site so the admin can display
 // images that were processed by the bundler instead of falling back to 404s.
-const imageModules = import.meta.glob('../../assets/images/**/*.{webp,png,jpg,jpeg,avif,gif,mp4,webm,ogg,mov}', {
+const mediaModules = import.meta.glob('../../assets/images/**/*.{webp,png,jpg,jpeg,avif,gif,mp4,webm,ogg,mov}', {
   eager: true,
   import: 'default',
 });
@@ -56,16 +56,29 @@ const MEDIA_MIME_MAP = {
   mov: "video/quicktime",
 };
 
+const SUPPORTED_UPLOAD_EXTENSIONS = Object.keys(MEDIA_MIME_MAP);
+const SUPPORTED_UPLOAD_MIME_TYPES = [
+  "image/webp",
+  "image/png",
+  "image/jpeg",
+  "image/gif",
+  "image/avif",
+  "video/mp4",
+  "video/webm",
+  "video/ogg",
+  "video/quicktime",
+];
+
 function isVideoMedia(src = "") {
   const cleanSrc = src.split("?")[0].toLowerCase();
   return /\.(mp4|webm|ogg|mov)$/i.test(cleanSrc);
 }
 
-function resolveBundledImage(src) {
+function resolveBundledMedia(src) {
   if (!src) return null;
   // portfolio data stores paths like 'assets/images/2025/ch/1/1.webp'
   const key = `../../${src}`;
-  return imageModules[key] || null;
+  return mediaModules[key] || null;
 }
 
 const trim = (value) => (typeof value === "string" ? value.trim() : "");
@@ -435,7 +448,7 @@ async function saveJsonFile(token, path, content, sha, message) {
   return newSha;
 }
 
-async function uploadImage(token, file, path, onAttempt = null) {
+async function uploadMedia(token, file, path, onAttempt = null) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = async () => {
@@ -525,7 +538,7 @@ function ProjectImage({ src, alt = "", className = "", numberLabel, token }) {
       // Local asset path in the repo (e.g. 'assets/images/...')
       if (/^assets\//.test(src)) {
         // First try to resolve the image to a bundled (hashed) asset included at build time
-        const bundled = resolveBundledImage(src);
+        const bundled = resolveBundledMedia(src);
         if (bundled) {
           setImageUrl(bundled);
           return;
@@ -616,7 +629,7 @@ function ProjectImage({ src, alt = "", className = "", numberLabel, token }) {
   }, [src, token]);
 
   const filename = src ? src.split('/').pop() : '';
-  const isVideo = isVideoMedia(src || imageUrl || "");
+  const isVideo = useMemo(() => isVideoMedia(src || imageUrl || ""), [src, imageUrl]);
 
   return (
     <div className={`relative overflow-hidden bg-stone-100 ${className}`}>
@@ -1091,7 +1104,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
     setUploading(true);
     setUploadProgress({ label: "Enviando mídia...", attempt: 1 });
     try {
-      const url = await uploadImage(token, file, path, (attempt, max) => {
+      const url = await uploadMedia(token, file, path, (attempt, max) => {
         setUploadProgress({
           label: attempt > 1 ? `Tentativa ${attempt}/${max}...` : "Enviando mídia...",
           attempt,
@@ -1117,7 +1130,25 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
     event.target.value = "";
 
     const ext = (file.name.split(".").pop() || "").toLowerCase();
-    if (!ext) return;
+    if (!ext) {
+      window.dispatchEvent(
+        new CustomEvent("admin-toast", {
+          detail: { msg: "Arquivo sem extensão não é suportado.", type: "error" },
+        }),
+      );
+      return;
+    }
+    if (!SUPPORTED_UPLOAD_EXTENSIONS.includes(ext)) {
+      window.dispatchEvent(
+        new CustomEvent("admin-toast", {
+          detail: {
+            msg: `Formato .${ext} não suportado. Use: ${SUPPORTED_UPLOAD_EXTENSIONS.join(", ")}`,
+            type: "error",
+          },
+        }),
+      );
+      return;
+    }
     const fileName = `${form.id}_${Date.now()}.${ext}`;
     const path = `assets/images/${form.year}/${form.trimester}/${form.categorySlug}/uploads/${fileName}`;
 
@@ -1312,12 +1343,12 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
                 {uploading ? "Enviando..." : "Upload arquivo"}
                 <input
                   type="file"
-                  accept="image/*,video/*,.gif"
+                  accept={SUPPORTED_UPLOAD_MIME_TYPES.join(",")}
                   onChange={handleFileUpload}
                   className="hidden"
                 />
               </label>
-              <span className="text-xs text-stone-400">PNG, JPG, GIF, WebP, MP4, WebM</span>
+              <span className="text-xs text-stone-400">PNG, JPG, JPEG, GIF, AVIF, WebP, MP4, WebM, OGG, MOV</span>
             </div>
 
             {form.images.length > 0 && (

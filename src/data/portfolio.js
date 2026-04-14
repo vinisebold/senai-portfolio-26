@@ -3,7 +3,7 @@ const dataModules = import.meta.glob('../../assets/data/*/*.json', {
   import: 'default',
 });
 
-const imageModules = import.meta.glob('../../assets/images/**/*.{webp,png,jpg,jpeg,avif,gif,mp4,webm,ogg,mov}', {
+const mediaModules = import.meta.glob('../../assets/images/**/*.{webp,png,jpg,jpeg,avif,gif,mp4,webm,ogg,mov}', {
   eager: true,
   import: 'default',
 });
@@ -46,9 +46,9 @@ const yearlyRawData = Object.entries(dataModules).reduce((acc, [path, content]) 
   return acc;
 }, {});
 
-const resolveImageSrc = (imagePath) => {
-  const key = `../../${imagePath}`;
-  return imageModules[key] || `/${imagePath}`;
+const resolveMediaSrc = (mediaPath) => {
+  const key = `../../${mediaPath}`;
+  return mediaModules[key] || `/${mediaPath}`;
 };
 
 const getMediaTypeFromPath = (path) => {
@@ -58,16 +58,16 @@ const getMediaTypeFromPath = (path) => {
   return 'image';
 };
 
-const toImageObject = (imagePath, trabalhoTema, index) => ({
-  src: resolveImageSrc(imagePath),
+const toMediaObject = (mediaPath, trabalhoTema, index) => ({
+  src: resolveMediaSrc(mediaPath),
   alt: `${trabalhoTema} - mídia ${index + 1}`,
-  type: getMediaTypeFromPath(imagePath),
+  type: getMediaTypeFromPath(mediaPath),
 });
 
 const normalizeTrabalho = (trabalho) => ({
   ...trabalho,
-  imagens: (trabalho.imagens || []).map((imagePath, index) =>
-    toImageObject(imagePath, trabalho.tema, index),
+  imagens: (trabalho.imagens || []).map((mediaPath, index) =>
+    toMediaObject(mediaPath, trabalho.tema, index),
   ),
 });
 
