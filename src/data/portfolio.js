@@ -3,7 +3,7 @@ const dataModules = import.meta.glob('../../assets/data/*/*.json', {
   import: 'default',
 });
 
-const imageModules = import.meta.glob('../../assets/images/**/*.{webp,png,jpg,jpeg,avif}', {
+const mediaModules = import.meta.glob('../../assets/images/**/*.{webp,png,jpg,jpeg,avif,gif,mp4,webm,ogg,mov}', {
   eager: true,
   import: 'default',
 });
@@ -46,20 +46,28 @@ const yearlyRawData = Object.entries(dataModules).reduce((acc, [path, content]) 
   return acc;
 }, {});
 
-const resolveImageSrc = (imagePath) => {
-  const key = `../../${imagePath}`;
-  return imageModules[key] || `/${imagePath}`;
+const resolveMediaSrc = (mediaPath) => {
+  const key = `../../${mediaPath}`;
+  return mediaModules[key] || `/${mediaPath}`;
 };
 
-const toImageObject = (imagePath, trabalhoTema, index) => ({
-  src: resolveImageSrc(imagePath),
-  alt: `${trabalhoTema} - imagem ${index + 1}`,
+const getMediaTypeFromPath = (path) => {
+  if (!path) return 'image';
+  const cleanPath = path.split('?')[0].toLowerCase();
+  if (/\.(mp4|webm|ogg|mov)$/i.test(cleanPath)) return 'video';
+  return 'image';
+};
+
+const toMediaObject = (mediaPath, trabalhoTema, index) => ({
+  src: resolveMediaSrc(mediaPath),
+  alt: `${trabalhoTema} - mídia ${index + 1}`,
+  type: getMediaTypeFromPath(mediaPath),
 });
 
 const normalizeTrabalho = (trabalho) => ({
   ...trabalho,
-  imagens: (trabalho.imagens || []).map((imagePath, index) =>
-    toImageObject(imagePath, trabalho.tema, index),
+  imagens: (trabalho.imagens || []).map((mediaPath, index) =>
+    toMediaObject(mediaPath, trabalho.tema, index),
   ),
 });
 

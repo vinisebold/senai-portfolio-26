@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const REPO_OWNER = "vinisebold";
@@ -38,16 +38,47 @@ const TRIMESTER_LABELS = {
 // Try to resolve bundled asset paths to their final (hashed) URLs at build time.
 // This mirrors the logic used by the public site so the admin can display
 // images that were processed by the bundler instead of falling back to 404s.
-const imageModules = import.meta.glob('../../assets/images/**/*.{webp,png,jpg,jpeg,avif}', {
+const mediaModules = import.meta.glob('../../assets/images/**/*.{webp,png,jpg,jpeg,avif,gif,mp4,webm,ogg,mov}', {
   eager: true,
   import: 'default',
 });
 
-function resolveBundledImage(src) {
+const MEDIA_MIME_MAP = {
+  webp: "image/webp",
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  avif: "image/avif",
+  gif: "image/gif",
+  mp4: "video/mp4",
+  webm: "video/webm",
+  ogg: "video/ogg",
+  mov: "video/quicktime",
+};
+
+const SUPPORTED_UPLOAD_EXTENSIONS = Object.keys(MEDIA_MIME_MAP);
+const SUPPORTED_UPLOAD_MIME_TYPES = [
+  "image/webp",
+  "image/png",
+  "image/jpeg",
+  "image/gif",
+  "image/avif",
+  "video/mp4",
+  "video/webm",
+  "video/ogg",
+  "video/quicktime",
+];
+
+function isVideoMedia(src = "") {
+  const cleanSrc = src.split("?")[0].toLowerCase();
+  return /\.(mp4|webm|ogg|mov)$/i.test(cleanSrc);
+}
+
+function resolveBundledMedia(src) {
   if (!src) return null;
   // portfolio data stores paths like 'assets/images/2025/ch/1/1.webp'
   const key = `../../${src}`;
-  return imageModules[key] || null;
+  return mediaModules[key] || null;
 }
 
 const trim = (value) => (typeof value === "string" ? value.trim() : "");
@@ -167,8 +198,8 @@ const ACTION_LABELS = {
   update: "Atualização de arquivo",
   create: "Criação de arquivo",
   delete: "Remoção de arquivo",
-  "update-image": "Substituição de imagem",
-  "create-image": "Upload de imagem",
+  "update-image": "Substituição de mídia",
+  "create-image": "Upload de mídia",
   "conflict-detected": "Conflito de versão detectado",
   "rollback": "Rollback executado",
 };
@@ -417,7 +448,7 @@ async function saveJsonFile(token, path, content, sha, message) {
   return newSha;
 }
 
-async function uploadImage(token, file, path, onAttempt = null) {
+async function uploadMedia(token, file, path, onAttempt = null) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = async () => {
@@ -442,7 +473,7 @@ async function uploadImage(token, file, path, onAttempt = null) {
               "PUT",
               `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`,
               {
-                message: `Upload image: ${path}`,
+                message: `Upload media: ${path}`,
                 content: base64,
                 ...(sha ? { sha } : {}),
                 branch: BRANCH,
@@ -507,7 +538,7 @@ function ProjectImage({ src, alt = "", className = "", numberLabel, token }) {
       // Local asset path in the repo (e.g. 'assets/images/...')
       if (/^assets\//.test(src)) {
         // First try to resolve the image to a bundled (hashed) asset included at build time
-        const bundled = resolveBundledImage(src);
+        const bundled = resolveBundledMedia(src);
         if (bundled) {
           setImageUrl(bundled);
           return;
@@ -528,8 +559,7 @@ function ProjectImage({ src, alt = "", className = "", numberLabel, token }) {
             for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
 
             const ext = (src.split('.').pop() || '').toLowerCase();
-            const mimeMap = { webp: 'image/webp', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', avif: 'image/avif' };
-            const mime = mimeMap[ext] || 'application/octet-stream';
+            const mime = MEDIA_MIME_MAP[ext] || 'application/octet-stream';
 
             const blob = new Blob([bytes], { type: mime });
             const url = URL.createObjectURL(blob);
@@ -566,8 +596,7 @@ function ProjectImage({ src, alt = "", className = "", numberLabel, token }) {
             const bytes = new Uint8Array(len);
             for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
             const ext = (repoPath.split('.').pop() || '').toLowerCase();
-            const mimeMap = { webp: 'image/webp', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', avif: 'image/avif' };
-            const mime = mimeMap[ext] || 'application/octet-stream';
+            const mime = MEDIA_MIME_MAP[ext] || 'application/octet-stream';
             const blob = new Blob([bytes], { type: mime });
             const url = URL.createObjectURL(blob);
             objectUrlRef.current = url;
@@ -600,6 +629,7 @@ function ProjectImage({ src, alt = "", className = "", numberLabel, token }) {
   }, [src, token]);
 
   const filename = src ? src.split('/').pop() : '';
+  const isVideo = useMemo(() => isVideoMedia(src || imageUrl || ""), [src, imageUrl]);
 
   return (
     <div className={`relative overflow-hidden bg-stone-100 ${className}`}>
@@ -608,24 +638,39 @@ function ProjectImage({ src, alt = "", className = "", numberLabel, token }) {
         <div className="absolute inset-0 bg-stone-200 animate-pulse" />
       )}
 
-      {/* Imagem real */}
+      {/* Mídia real */}
       {imageUrl && (
-        <img
-          src={imageUrl}
-          alt={alt}
-          className={`w-full h-full object-cover transition-opacity duration-300 ${
-            status === "ok" ? "opacity-100" : "opacity-0 absolute inset-0"
-          }`}
-          onLoad={() => setStatus("ok")}
-          onError={() => setStatus("broken")}
-        />
+        isVideo ? (
+          <video
+            src={imageUrl}
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              status === "ok" ? "opacity-100" : "opacity-0 absolute inset-0"
+            }`}
+            controls
+            muted
+            playsInline
+            preload="metadata"
+            onLoadedData={() => setStatus("ok")}
+            onError={() => setStatus("broken")}
+          />
+        ) : (
+          <img
+            src={imageUrl}
+            alt={alt}
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              status === "ok" ? "opacity-100" : "opacity-0 absolute inset-0"
+            }`}
+            onLoad={() => setStatus("ok")}
+            onError={() => setStatus("broken")}
+          />
+        )
       )}
 
-      {/* Estado de imagem não encontrada */}
+      {/* Estado de mídia não encontrada */}
       {status === "broken" && (
         <div
           className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-2"
-          title={src || "Sem imagem"}
+          title={src || "Sem mídia"}
         >
           {/* Ícone simples: moldura quebrada em SVG inline */}
           <svg
@@ -1057,11 +1102,11 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
 
   async function doUpload(file, path) {
     setUploading(true);
-    setUploadProgress({ label: "Enviando imagem...", attempt: 1 });
+    setUploadProgress({ label: "Enviando mídia...", attempt: 1 });
     try {
-      const url = await uploadImage(token, file, path, (attempt, max) => {
+      const url = await uploadMedia(token, file, path, (attempt, max) => {
         setUploadProgress({
-          label: attempt > 1 ? `Tentativa ${attempt}/${max}...` : "Enviando imagem...",
+          label: attempt > 1 ? `Tentativa ${attempt}/${max}...` : "Enviando mídia...",
           attempt,
         });
       });
@@ -1084,9 +1129,28 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
     if (!file) return;
     event.target.value = "";
 
-    const ext = file.name.split(".").pop();
+    const ext = (file.name.split(".").pop() || "").toLowerCase();
+    if (!ext) {
+      window.dispatchEvent(
+        new CustomEvent("admin-toast", {
+          detail: { msg: "Arquivo sem extensão não é suportado.", type: "error" },
+        }),
+      );
+      return;
+    }
+    if (!SUPPORTED_UPLOAD_EXTENSIONS.includes(ext)) {
+      window.dispatchEvent(
+        new CustomEvent("admin-toast", {
+          detail: {
+            msg: `Formato .${ext} não suportado. Use: ${SUPPORTED_UPLOAD_EXTENSIONS.join(", ")}`,
+            type: "error",
+          },
+        }),
+      );
+      return;
+    }
     const fileName = `${form.id}_${Date.now()}.${ext}`;
-        const path = `assets/images/${form.year}/${form.trimester}/${form.categorySlug}/uploads/${fileName}`;
+    const path = `assets/images/${form.year}/${form.trimester}/${form.categorySlug}/uploads/${fileName}`;
 
     // Verifica se já existe imagem com o mesmo nome no form
     const alreadyExists = form.images.some((img) => img.includes(fileName));
@@ -1249,7 +1313,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
 
           {/* Imagens */}
           <div className="flex flex-col gap-3">
-            <label className="text-xs tracking-[0.15em] uppercase text-stone-500">Imagens</label>
+            <label className="text-xs tracking-[0.15em] uppercase text-stone-500">Mídias</label>
 
             <div className="flex gap-2">
               <input
@@ -1262,7 +1326,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
                     addImageUrl();
                   }
                 }}
-                placeholder="https://... ou URL de imagem"
+                placeholder="https://... ou URL de mídia"
                 className="flex-1 bg-transparent border-b border-stone-300 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
               />
               <Btn small onClick={addImageUrl} variant="ghost">
@@ -1277,9 +1341,14 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
                 }`}
               >
                 {uploading ? "Enviando..." : "Upload arquivo"}
-                <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                <input
+                  type="file"
+                  accept={SUPPORTED_UPLOAD_MIME_TYPES.join(",")}
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
               </label>
-              <span className="text-xs text-stone-400">PNG, JPG, WebP</span>
+              <span className="text-xs text-stone-400">PNG, JPG, JPEG, GIF, AVIF, WebP, MP4, WebM, OGG, MOV</span>
             </div>
 
             {form.images.length > 0 && (
