@@ -1,5 +1,21 @@
 {
-  "1": [],
+  "1": [
+    {
+      "id": "ch-1776704842491",
+      "tema": "Divisão Celular",
+      "descricao": "Os estudantes desenvolveram um projeto autoral com o objetivo de representar e explicar os processos de mitose e meiose. Em grupos, puderam escolher entre diferentes formatos de produção, como a construção de uma maquete física ou o desenvolvimento de um recurso digital (programa, site ou software).\nOs trabalhos deveriam contemplar as etapas de cada tipo de divisão celular (prófase, metáfase, anáfase e telófase), evidenciando as principais diferenças entre mitose e meiose, como o número de divisões, o comportamento dos cromossomos e os resultados finais das células formadas.",
+      "habilidades": [
+        "H12 - Relacionar informações para construir modelos em ciência e tecnologia."
+      ],
+      "imagens": [
+        "https://github.com/vinisebold/senai-portfolio-26/raw/main/assets/images/2026/1/ciencias-natureza/uploads/ch-1776704842491_1776704966370.png",
+        "https://github.com/vinisebold/senai-portfolio-26/raw/main/assets/images/2026/1/ciencias-natureza/uploads/ch-1776704842491_1776705036578.png",
+        "https://github.com/vinisebold/senai-portfolio-26/raw/main/assets/images/2026/1/ciencias-natureza/uploads/ch-1776704842491_1776705131383.png",
+        "https://github.com/vinisebold/senai-portfolio-26/raw/main/assets/images/2026/1/ciencias-natureza/uploads/ch-1776704842491_1776705136866.png"
+      ],
+      "link": "https://meiosemitosepatrick.vercel.app/"
+    }
+  ],
   "2": [],
   "3": []
 }
