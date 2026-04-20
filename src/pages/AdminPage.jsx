@@ -487,9 +487,7 @@ async function uploadMedia(token, file, path, onAttempt = null) {
         );
 
         appendAuditLog({ action: sha ? "update-image" : "create-image", path });
-        resolve(
-          `https://github.com/${REPO_OWNER}/${REPO_NAME}/raw/${BRANCH}/${path}`,
-        );
+        resolve(path);
       } catch (error) {
         reject(error);
       }

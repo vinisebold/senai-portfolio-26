@@ -46,9 +46,53 @@ const yearlyRawData = Object.entries(dataModules).reduce((acc, [path, content]) 
   return acc;
 }, {});
 
+const normalizeMediaPath = (mediaPath = '') => {
+  const value = String(mediaPath).trim();
+  if (!value) return '';
+
+  if (!/^https?:\/\//i.test(value)) {
+    return value.replace(/^\/+/, '');
+  }
+
+  try {
+    const url = new URL(value);
+
+    // https://github.com/<owner>/<repo>/raw/<branch>/<path>
+    if (url.hostname === 'github.com') {
+      const githubRawMatch = url.pathname.match(/^\/[^/]+\/[^/]+\/raw\/[^/]+\/(.+)$/);
+      if (githubRawMatch) {
+        return decodeURIComponent(githubRawMatch[1]);
+      }
+    }
+
+    // https://raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>
+    if (url.hostname === 'raw.githubusercontent.com') {
+      const rawGithubMatch = url.pathname.match(/^\/[^/]+\/[^/]+\/[^/]+\/(.+)$/);
+      if (rawGithubMatch) {
+        return decodeURIComponent(rawGithubMatch[1]);
+      }
+    }
+  } catch {
+    return value;
+  }
+
+  return value;
+};
+
 const resolveMediaSrc = (mediaPath) => {
-  const key = `../../${mediaPath}`;
-  return mediaModules[key] || `/${mediaPath}`;
+  const normalizedPath = normalizeMediaPath(mediaPath);
+  if (!normalizedPath) return '';
+
+  const key = `../../${normalizedPath}`;
+  if (mediaModules[key]) {
+    return mediaModules[key];
+  }
+
+  if (/^https?:\/\//i.test(normalizedPath)) {
+    return normalizedPath;
+  }
+
+  return `/${normalizedPath}`;
 };
 
 const getMediaTypeFromPath = (path) => {
