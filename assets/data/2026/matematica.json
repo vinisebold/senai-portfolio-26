@@ -1,5 +1,21 @@
 {
-  "1": [],
+  "1": [
+    {
+      "id": "ch-1776775193109",
+      "tema": "Desafio Combinatório: Criando Problemas e Explorando a Análise Combinatória",
+      "descricao": "Nesta atividade, os estudantes deverão criar uma cena ou situação do cotidiano e inserir nela problemas envolvendo Análise Combinatória.\nA proposta é transformar um contexto comum (restaurante, desfile de moda, viagem, jogos, organização de equipes, cardápio, sorveteria etc.) em um cenário matemático no qual diferentes possibilidades precisam ser contadas.\nCada grupo deverá criar e resolver três problemas matemáticos obrigatoriamente:\n• 1 problema de Arranjo\n• 1 problema de Permutação\n• 1 problema de Combinação\nOs problemas devem estar integrados à cena criada pelo grupo e acompanhados da resolução e explicação do raciocínio utilizado.\nFormação dos Grupos\nFormem grupos de 3 a 5 estudantes.\nInstruções\n1. Escolham um tema ou situação do cotidiano para construir a cena (ex.: restaurante, sorveteria, desfile de moda, campeonato esportivo, organização de lugares em uma mesa, montagem de playlist etc.).\n2. Dentro da cena escolhida, criem três problemas diferentes: um de Arranjo, um de Permutação e um de Combinação.\n3. Cada problema deve conter: enunciado claro, situação contextualizada, cálculo da quantidade de possibilidades e explicação do raciocínio.\n4. Os problemas devem ser originais e criados pelo grupo.\n5. Dividam as tarefas entre os membros do grupo (criação da cena, elaboração dos problemas, cálculos e apresentação).\nApresentação dos Resultados\nCada grupo deverá apresentar sua cena para a turma de forma criativa, podendo utilizar teatro, cartazes, slides, desenhos, tabelas, diagramas ou árvore de possibilidades.\nA apresentação deve explicar a situação criada, os três problemas elaborados, o tipo de contagem utilizado e o cálculo das possibilidades.\nTempo de apresentação: aproximadamente 15 a 20 minutos por grupo.\nRegistro da Atividade no Portfólio\nCada grupo deverá registrar a atividade realizada no portfólio da disciplina.\nO portfólio deverá conter obrigatoriamente:\n• Título da atividade.\n• Objetivos da atividade.\n• Habilidades e competências desenvolvidas.\n• Roteiro da apresentação (descrição da cena criada).\n• As três questões elaboradas pelo grupo (Arranjo, Permutação e Combinação).\n• Resolução das questões e explicação do raciocínio utilizado.\n• Fotos da apresentação realizada em sala de aula.\n• Vídeos ou registros da dramatização/apresentação.\nCritérios de Avaliação\nConhecimento Matemático: compreensão correta de arranjo, permutação e combinação; aplicação adequada dos métodos de contagem.\nOrganização e Clareza: explicação clara dos problemas e dos cálculos.\nCriatividade: originalidade da cena criada e uso de recursos visuais.\nTrabalho em Equipe: participação e colaboração entre os integrantes.\nComunicação: clareza na apresentação e capacidade de explicar o raciocínio matemático.",
+      "habilidades": [
+        "C5 - Aplicar o pensamento probabilístico para quantificar e fazer previsões em situações aplicadas a diferentes áreas do conhecimento e da vida cotidiana. H30 - Identificar dados, regularidades e relações numa situação que envolva o raciocínio combinatório, utilizando os processos de contagem."
+      ],
+      "imagens": [
+        "assets/images/2026/1/matematica/uploads/ch-1776775193109_1776775495938.jpg",
+        "assets/images/2026/1/matematica/uploads/ch-1776775193109_1776775500967.jpg",
+        "assets/images/2026/1/matematica/uploads/ch-1776775193109_1776775505905.jpg",
+        "assets/images/2026/1/matematica/uploads/ch-1776775193109_1776775509978.jpg",
+        "assets/images/2026/1/matematica/uploads/ch-1776775193109_1776775665981.jpg"
+      ]
+    }
+  ],
   "2": [],
   "3": []
 }
