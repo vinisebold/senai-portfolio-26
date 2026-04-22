@@ -2128,21 +2128,21 @@ function Dashboard({ token, onLogout }) {
               <button
                 type="button"
                 onClick={() => toggleFilter("year")}
-                className="bg-stone-100 text-stone-800 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest hover:bg-stone-200 transition-colors"
+                className="bg-stone-100 text-stone-700 px-3 py-2 text-[10px] font-normal uppercase tracking-widest hover:bg-stone-200 transition-colors"
               >
                 {filterYear === "all" ? "Ano: todos" : `Ano: ${filterYear}`}
               </button>
               <button
                 type="button"
                 onClick={() => toggleFilter("category")}
-                className="bg-stone-100 text-stone-800 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest hover:bg-stone-200 transition-colors"
+                className="bg-stone-100 text-stone-700 px-3 py-2 text-[10px] font-normal uppercase tracking-widest hover:bg-stone-200 transition-colors"
               >
                 {filterCat === "all" ? "Matéria: todas" : `Matéria: ${categoryLabelMap[filterCat] || filterCat}`}
               </button>
               <button
                 type="button"
                 onClick={() => toggleFilter("trimester")}
-                className="bg-stone-100 text-stone-800 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest hover:bg-stone-200 transition-colors"
+                className="bg-stone-100 text-stone-700 px-3 py-2 text-[10px] font-normal uppercase tracking-widest hover:bg-stone-200 transition-colors"
               >
                 {filterTri === "all" ? "Trimestre: todos" : `Trimestre: ${trimesterLabelMap[filterTri] || filterTri}`}
               </button>
@@ -2310,10 +2310,10 @@ function Dashboard({ token, onLogout }) {
             onClick={closeFilter}
           >
             <div
-              className="absolute right-8 top-[128px] w-64 bg-white shadow-2xl"
+              className="absolute right-0 top-full mt-2 w-64 bg-white shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="px-4 py-3 text-[10px] font-semibold uppercase tracking-widest text-stone-600">
+              <div className="px-4 py-3 text-[10px] font-normal uppercase tracking-widest text-stone-600">
                 {openFilter === "year" && "Ano"}
                 {openFilter === "category" && "Matéria"}
                 {openFilter === "trimester" && "Trimestre"}
@@ -2321,25 +2321,25 @@ function Dashboard({ token, onLogout }) {
               <div className="py-1 max-h-72 overflow-y-auto">
                 {openFilter === "year" && (
                   <>
-                    <button type="button" onClick={() => { setFilterYear("all"); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm text-stone-900 hover:bg-stone-50">Todos</button>
+                    <button type="button" onClick={() => { setFilterYear("all"); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm font-normal text-stone-700 hover:bg-stone-50">Todos</button>
                     {years.map((y) => (
-                      <button key={y} type="button" onClick={() => { setFilterYear(y); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm text-stone-900 hover:bg-stone-50">{y}</button>
+                      <button key={y} type="button" onClick={() => { setFilterYear(y); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm font-normal text-stone-700 hover:bg-stone-50">{y}</button>
                     ))}
                   </>
                 )}
                 {openFilter === "category" && (
                   <>
-                    <button type="button" onClick={() => { setFilterCat("all"); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm text-stone-900 hover:bg-stone-50">Todas</button>
+                    <button type="button" onClick={() => { setFilterCat("all"); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm font-normal text-stone-700 hover:bg-stone-50">Todas</button>
                     {categories.map((c) => (
-                      <button key={c.slug} type="button" onClick={() => { setFilterCat(c.slug); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm text-stone-900 hover:bg-stone-50">{c.label}</button>
+                      <button key={c.slug} type="button" onClick={() => { setFilterCat(c.slug); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm font-normal text-stone-700 hover:bg-stone-50">{c.label}</button>
                     ))}
                   </>
                 )}
                 {openFilter === "trimester" && (
                   <>
-                    <button type="button" onClick={() => { setFilterTri("all"); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm text-stone-900 hover:bg-stone-50">Todos</button>
+                    <button type="button" onClick={() => { setFilterTri("all"); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm font-normal text-stone-700 hover:bg-stone-50">Todos</button>
                     {trimesters.map((t) => (
-                      <button key={t.key} type="button" onClick={() => { setFilterTri(t.key); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm text-stone-900 hover:bg-stone-50">{t.label}</button>
+                      <button key={t.key} type="button" onClick={() => { setFilterTri(t.key); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm font-normal text-stone-700 hover:bg-stone-50">{t.label}</button>
                     ))}
                   </>
                 )}
@@ -2558,7 +2558,7 @@ function Dashboard({ token, onLogout }) {
         <button
           type="button"
           onClick={() => setFabOpen((v) => !v)}
-          className="h-14 w-14 bg-stone-100 text-stone-800 shadow-xl hover:bg-stone-200 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-700 focus:ring-offset-2"
+          className="h-14 w-14 bg-stone-900 text-white shadow-xl hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-900 focus:ring-offset-2"
           aria-label="Menu de ações"
         >
           <motion.svg
