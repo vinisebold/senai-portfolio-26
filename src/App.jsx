@@ -27,7 +27,7 @@ const AnimatedRoutes = () => {
 
 const AppLayout = () => {
   const location = useLocation();
-  const showNavbar = location.pathname !== '/';
+  const showNavbar = location.pathname !== '/' && location.pathname !== '/admin';
 
   return (
     <div className="min-h-screen bg-white">

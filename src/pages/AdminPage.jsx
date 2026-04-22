@@ -795,7 +795,7 @@ function Input({ label, value, onChange, placeholder, type = "text", required })
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
-        className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
+        className="bg-white px-3 py-2 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-300 transition-colors"
       />
     </div>
   );
@@ -808,7 +808,7 @@ function Select({ label, value, onChange, options }) {
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:border-stone-900 transition-colors cursor-pointer"
+        className="bg-white px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-300 transition-colors cursor-pointer"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -822,11 +822,11 @@ function Select({ label, value, onChange, options }) {
 
 function Btn({ children, onClick, variant = "primary", disabled, small, type = "button", className = "" }) {
   const base =
-    "tracking-[0.1em] uppercase text-xs transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed font-medium rounded-none";
+    "tracking-[0.1em] uppercase text-xs transition-all duration-200 disabled:cursor-not-allowed font-semibold rounded-none";
   const variants = {
-    primary: `bg-stone-900 text-white ${small ? "px-4 py-2" : "px-8 py-3"} hover:bg-stone-800`,
-    ghost: `bg-stone-100 text-stone-800 ${small ? "px-4 py-2" : "px-8 py-3"} hover:bg-stone-200 hover:text-stone-900`,
-    danger: `bg-red-50 text-red-600 ${small ? "px-4 py-2" : "px-8 py-3"} hover:bg-red-100`,
+    primary: `bg-stone-100 text-stone-800 ${small ? "px-4 py-2" : "px-8 py-3"} hover:bg-stone-200 disabled:bg-stone-100 disabled:text-stone-500`,
+    ghost: `bg-transparent text-stone-800 ${small ? "px-4 py-2" : "px-8 py-3"} hover:bg-stone-100 disabled:text-stone-500`,
+    danger: `bg-red-600 text-white ${small ? "px-4 py-2" : "px-8 py-3"} hover:bg-red-700 disabled:bg-red-400`,
   };
 
   return (
@@ -853,7 +853,7 @@ function Toast({ msg, type }) {
           ? "bg-red-600 text-white"
           : type === "warning"
           ? "bg-amber-200 text-stone-900"
-          : "bg-stone-900 text-white"
+          : "bg-stone-100 text-stone-800"
       }`}
     >
       {msg}
@@ -869,10 +869,10 @@ function FabActionButton({ label, marker, onClick, subdued }) {
       className="group flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 hover:text-stone-900 focus:bg-stone-50 focus:outline-none"
     >
       <span
-        className={`flex h-6 w-6 items-center justify-center text-[10px] font-bold tracking-widest border border-stone-200 transition-colors ${
+        className={`flex h-6 w-6 items-center justify-center text-[10px] font-bold tracking-widest transition-colors ${
           subdued
-            ? "bg-stone-100 text-stone-500 group-hover:bg-stone-200"
-            : "bg-stone-100 text-stone-600 group-hover:bg-stone-900 group-hover:text-white group-hover:border-stone-900"
+            ? "bg-stone-200 text-stone-700 group-hover:bg-stone-300"
+            : "bg-stone-200 text-stone-800 group-hover:bg-stone-300"
         }`}
       >
         {marker}
@@ -895,7 +895,7 @@ function ProgressBar({ progress, label, visible }) {
         >
           <div className="h-0.5 bg-stone-100 w-full">
             <motion.div
-              className="h-full bg-stone-900"
+              className="h-full bg-stone-600"
               initial={{ width: "0%" }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.4, ease: "easeOut" }}
@@ -905,10 +905,10 @@ function ProgressBar({ progress, label, visible }) {
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-3 h-3 border border-stone-900 border-t-transparent rounded-full flex-shrink-0"
+              className="w-2.5 h-2.5 bg-stone-600 rounded-none flex-shrink-0"
             />
             <p className="text-xs tracking-[0.15em] uppercase text-stone-600">{label}</p>
-            <span className="ml-auto text-xs text-stone-400">{Math.round(progress)}%</span>
+            <span className="ml-auto text-xs text-stone-700">{Math.round(progress)}%</span>
           </div>
         </motion.div>
       )}
@@ -956,7 +956,7 @@ function AuditLogPanel({ onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-black/40 flex justify-end"
+      className="fixed inset-0 z-50 bg-stone-200/50 flex justify-end"
       onClick={onClose}
     >
       <motion.div
@@ -968,9 +968,9 @@ function AuditLogPanel({ onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="border-b border-stone-200 bg-white px-6 py-4 flex items-center justify-between flex-shrink-0">
+        <div className="bg-white px-6 py-4 flex items-center justify-between flex-shrink-0">
           <div>
-            <p className="text-xs tracking-[0.3em] uppercase text-stone-400">Admin</p>
+            <p className="text-xs tracking-[0.3em] uppercase text-stone-600">Admin</p>
             <h2 className="text-lg font-light text-stone-900" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
               Log de Auditoria
             </h2>
@@ -979,14 +979,14 @@ function AuditLogPanel({ onClose }) {
             {logs.length > 0 && (
               <button
                 onClick={handleClear}
-                className="text-xs tracking-widest uppercase text-red-400 hover:text-red-600 transition-colors"
+                className="text-xs tracking-widest uppercase text-red-600 hover:text-red-700 transition-colors"
               >
                 Limpar
               </button>
             )}
             <button
               onClick={onClose}
-              className="text-xs tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors"
+              className="text-xs tracking-widest uppercase text-stone-700 hover:text-stone-900 transition-colors"
             >
               Fechar
             </button>
@@ -997,12 +997,12 @@ function AuditLogPanel({ onClose }) {
         <div className="flex-1 overflow-y-auto">
           {logs.length === 0 ? (
             <div className="flex items-center justify-center h-40">
-              <p className="text-sm text-stone-400 tracking-wide">Nenhuma entrada no log.</p>
+              <p className="text-sm text-stone-600 tracking-wide">Nenhuma entrada no log.</p>
             </div>
           ) : (
-            <ul className="divide-y divide-stone-200">
+            <ul className="space-y-2 p-2">
               {logs.map((entry, i) => (
-                <li key={i} className="px-6 py-4 bg-white hover:bg-stone-50 transition-colors">
+                <li key={i} className="px-4 py-4 bg-white hover:bg-stone-50 transition-colors">
                   <div className="flex items-start justify-between gap-4 mb-1">
                     <span
                       className={`text-xs tracking-[0.1em] uppercase font-medium ${
@@ -1011,7 +1011,7 @@ function AuditLogPanel({ onClose }) {
                     >
                       {ACTION_LABELS[entry.action] || entry.action}
                     </span>
-                    <span className="text-xs text-stone-400 flex-shrink-0">
+                    <span className="text-xs text-stone-600 flex-shrink-0">
                       {formatTime(entry.timestamp)}
                     </span>
                   </div>
@@ -1019,7 +1019,7 @@ function AuditLogPanel({ onClose }) {
                     <p className="text-xs text-stone-500 font-mono break-all">{entry.path}</p>
                   )}
                   {entry.message && (
-                    <p className="text-xs text-stone-400 mt-0.5 italic">{entry.message}</p>
+                    <p className="text-xs text-stone-600 mt-0.5 italic">{entry.message}</p>
                   )}
                   {entry.error && (
                     <p className="text-xs text-red-500 mt-0.5">Erro: {entry.error}</p>
@@ -1031,8 +1031,8 @@ function AuditLogPanel({ onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="border-t border-stone-200 px-6 py-3 bg-white flex-shrink-0">
-          <p className="text-xs text-stone-400">
+        <div className="px-6 py-3 bg-white flex-shrink-0">
+          <p className="text-xs text-stone-600">
             {logs.length} {logs.length === 1 ? "entrada" : "entradas"} · armazenado localmente
           </p>
         </div>
@@ -1048,7 +1048,7 @@ function ConfirmModal({ title, description, confirmLabel = "Confirmar", variant 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center px-6"
+      className="fixed inset-0 z-50 bg-stone-200/50 flex items-center justify-center px-6"
     >
       <motion.div
         initial={{ scale: 0.96, opacity: 0 }}
@@ -1062,7 +1062,7 @@ function ConfirmModal({ title, description, confirmLabel = "Confirmar", variant 
         >
           {title}
         </h3>
-        <p className="text-sm text-stone-500 mb-6">{description}</p>
+        <p className="text-sm text-stone-700 mb-6">{description}</p>
         <div className="flex gap-3">
           <Btn variant={variant} disabled={saving} onClick={onConfirm}>
             {saving ? "Aguarde..." : confirmLabel}
@@ -1082,7 +1082,7 @@ function ModalShell({ title, onClose, children, footer }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center px-6"
+      className="fixed inset-0 z-50 bg-stone-200/50 flex items-center justify-center px-6"
       onClick={onClose}
     >
       <motion.div
@@ -1090,12 +1090,12 @@ function ModalShell({ title, onClose, children, footer }) {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.98, opacity: 0 }}
         transition={{ duration: 0.18, ease: "easeOut" }}
-        className="bg-white w-full max-w-xl shadow-2xl border border-stone-100"
+        className="bg-white w-full max-w-xl shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-8 py-6 border-b border-stone-100 flex items-start justify-between gap-6">
+        <div className="px-8 py-6 flex items-start justify-between gap-6">
           <div>
-            <p className="text-xs tracking-[0.3em] uppercase text-stone-400">Admin</p>
+            <p className="text-xs tracking-[0.3em] uppercase text-stone-600">Admin</p>
             <h3 className="text-lg font-light text-stone-900" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
               {title}
             </h3>
@@ -1103,7 +1103,7 @@ function ModalShell({ title, onClose, children, footer }) {
           <button
             type="button"
             onClick={onClose}
-            className="text-xs tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors"
+            className="text-xs tracking-widest uppercase text-stone-700 hover:text-stone-900 transition-colors"
           >
             Fechar
           </button>
@@ -1111,7 +1111,7 @@ function ModalShell({ title, onClose, children, footer }) {
 
         <div className="px-8 py-6">{children}</div>
 
-        {footer && <div className="px-8 py-5 border-t border-stone-100 bg-white">{footer}</div>}
+        {footer && <div className="px-8 py-5 bg-white">{footer}</div>}
       </motion.div>
     </motion.div>
   );
@@ -1148,14 +1148,14 @@ function LoginScreen({ onLogin }) {
         className="w-full max-w-md"
       >
         <div className="mb-12">
-          <p className="text-xs tracking-[0.3em] uppercase text-stone-400 mb-3">Portfólio Admin</p>
+          <p className="text-xs tracking-[0.3em] uppercase text-stone-600 mb-3">Portfólio Admin</p>
           <h1
             className="text-4xl font-light text-stone-900"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
             Acesso Restrito
           </h1>
-          <div className="mt-4 w-8 h-px bg-stone-900" />
+          <div className="mt-4 w-8 h-px bg-stone-600" />
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -1168,7 +1168,7 @@ function LoginScreen({ onLogin }) {
               value={token}
               onChange={(e) => setToken(e.target.value)}
               placeholder="github_pat_..."
-              className="bg-stone-50 border border-stone-200 px-3 py-3 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
+              className="bg-white px-3 py-3 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-300 transition-colors"
             />
           </div>
 
@@ -1318,12 +1318,12 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years, categori
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="fixed top-0 left-0 right-0 z-50 bg-stone-900 text-white py-2 px-6 flex items-center gap-3"
+            className="fixed top-0 left-0 right-0 z-50 bg-stone-100 text-stone-800 py-2 px-6 flex items-center gap-3"
           >
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-3 h-3 border border-white border-t-transparent rounded-full flex-shrink-0"
+              className="w-2.5 h-2.5 bg-white rounded-none flex-shrink-0"
             />
             <span className="text-xs tracking-[0.15em] uppercase">{uploadProgress.label}</span>
           </motion.div>
@@ -1333,7 +1333,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years, categori
       <div className="max-w-2xl mx-auto px-8 py-16">
         <div className="mb-10 flex items-start justify-between">
           <div>
-            <p className="text-xs tracking-[0.3em] uppercase text-stone-400 mb-2">
+            <p className="text-xs tracking-[0.3em] uppercase text-stone-600 mb-2">
               {project.title ? "Editar" : "Novo"} Projeto
             </p>
             <h2
@@ -1346,7 +1346,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years, categori
           <button
             type="button"
             onClick={onCancel}
-            className="text-stone-400 hover:text-stone-900 text-xs tracking-widest uppercase mt-2"
+            className="text-stone-700 hover:text-stone-900 text-xs tracking-widest uppercase mt-2"
           >
             Cancelar
           </button>
@@ -1375,7 +1375,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years, categori
                 onChange={(e) => set("description", e.target.value)}
                 rows={4}
                 placeholder="Descreva o projeto..."
-                className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors resize-none"
+                className="bg-white px-3 py-2 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-300 transition-colors resize-none"
               />
             </div>
           </div>
@@ -1423,7 +1423,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years, categori
                   }
                 }}
                 placeholder="Ex: Biologia, Cálculo..."
-                className="flex-1 bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
+                className="flex-1 bg-white px-3 py-2 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-300 transition-colors"
               />
               <Btn small onClick={addSkill} variant="ghost">
                 Adicionar
@@ -1439,7 +1439,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years, categori
                     <button
                       type="button"
                       onClick={() => removeSkill(skill)}
-                      className="ml-1 text-stone-400 hover:text-red-500 text-base leading-none transition-colors"
+                      className="ml-1 text-stone-600 hover:text-red-600 text-base leading-none transition-colors"
                     >
                       &times;
                     </button>
@@ -1464,7 +1464,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years, categori
                   }
                 }}
                 placeholder="https://... ou URL de mídia"
-                className="flex-1 bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
+                className="flex-1 bg-white px-3 py-2 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-300 transition-colors"
               />
               <Btn small onClick={addImageUrl} variant="ghost">
                 + URL
@@ -1473,7 +1473,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years, categori
 
             <div className="flex items-center gap-3">
               <label
-                className={`cursor-pointer text-xs tracking-[0.1em] uppercase bg-stone-50 text-stone-700 px-4 py-2 hover:bg-stone-200 hover:text-stone-900 transition-colors font-medium ${
+                className={`cursor-pointer text-xs tracking-[0.1em] uppercase bg-stone-100 text-stone-800 px-4 py-2 hover:bg-stone-200 transition-colors font-semibold ${
                   uploading ? "opacity-40 pointer-events-none" : ""
                 }`}
               >
@@ -1485,7 +1485,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years, categori
                   className="hidden"
                 />
               </label>
-              <span className="text-xs text-stone-400">PNG, JPG, JPEG, GIF, AVIF, WebP, MP4, WebM, OGG, MOV</span>
+              <span className="text-xs text-stone-600">PNG, JPG, JPEG, GIF, AVIF, WebP, MP4, WebM, OGG, MOV</span>
             </div>
 
             {form.images.length > 0 && (
@@ -1505,7 +1505,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years, categori
                     <button
                       type="button"
                       onClick={() => requestRemoveImage(index)}
-                      className="absolute top-1 right-1 z-10 bg-red-600 text-white text-xs w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1 right-1 z-10 bg-red-500 text-white text-xs w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                       title="Remover imagem"
                     >
                       ×
@@ -1516,7 +1516,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years, categori
             )}
           </div>
 
-          <div className="flex gap-4 pt-4 border-t border-stone-200">
+          <div className="flex gap-4 pt-4">
             <Btn type="submit" disabled={saving || !form.title.trim()}>
               {saving ? "Salvando..." : "Salvar projeto"}
             </Btn>
@@ -1579,12 +1579,13 @@ function Dashboard({ token, onLogout }) {
   const [filterYear, setFilterYear] = useState("all");
   const [filterCat, setFilterCat] = useState("all");
   const [filterTri, setFilterTri] = useState("all");
+  const [openFilter, setOpenFilter] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [showAuditLog, setShowAuditLog] = useState(false);
 
   // FAB + modals
   const [fabOpen, setFabOpen] = useState(false);
-  const [activeModal, setActiveModal] = useState(null); // 'filters' | 'years' | 'categories' | 'trimesters'
+  const [activeModal, setActiveModal] = useState(null); // 'years' | 'categories' | 'trimesters'
   const [categoryToRemove, setCategoryToRemove] = useState(null);
 
   const [newCategoryLabel, setNewCategoryLabel] = useState("");
@@ -1618,6 +1619,14 @@ function Dashboard({ token, onLogout }) {
 
   function closeModal() {
     setActiveModal(null);
+  }
+
+  function toggleFilter(kind) {
+    setOpenFilter((current) => (current === kind ? null : kind));
+  }
+
+  function closeFilter() {
+    setOpenFilter(null);
   }
 
   // Progresso de operações longas
@@ -2061,7 +2070,7 @@ function Dashboard({ token, onLogout }) {
     return (
       <div className="min-h-screen bg-[#F5F3F0] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xs tracking-[0.3em] uppercase text-stone-400 animate-pulse">
+          <p className="text-xs tracking-[0.3em] uppercase text-stone-600 animate-pulse">
             Carregando portfólio...
           </p>
         </div>
@@ -2078,10 +2087,10 @@ function Dashboard({ token, onLogout }) {
         label={progress.label}
       />
 
-      <header className="border-b border-stone-200 bg-white sticky top-0 z-30">
-        <div className="max-w-[1400px] mx-auto px-8 py-4 flex items-center justify-between">
+      <header className="bg-white sticky top-0 z-30">
+        <div className="max-w-[1400px] mx-auto px-8 py-4 flex items-center justify-between pl-24 md:pl-28">
           <div>
-            <p className="text-xs tracking-[0.3em] uppercase text-stone-400">Painel Admin</p>
+            <p className="text-xs tracking-[0.3em] uppercase text-stone-600">Painel Admin</p>
             <h1
               className="text-xl font-light text-stone-900"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
@@ -2093,14 +2102,14 @@ function Dashboard({ token, onLogout }) {
             <button
               type="button"
               onClick={() => setShowAuditLog(true)}
-              className="text-xs tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors"
+              className="text-xs tracking-widest uppercase text-stone-700 hover:text-stone-900 transition-colors"
             >
               Log
             </button>
             <button
               type="button"
               onClick={onLogout}
-              className="text-xs tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors"
+              className="text-xs tracking-widest uppercase text-stone-700 hover:text-stone-900 transition-colors"
             >
               Sair
             </button>
@@ -2114,28 +2123,38 @@ function Dashboard({ token, onLogout }) {
             Trabalhos
           </h2>
 
-          <div className="text-right">
-            <p className="text-[10px] uppercase tracking-widest text-stone-400">
-              {filterYear === "all" ? "Ano: todos" : `Ano: ${filterYear}`}
-              {" · "}
-              {filterCat === "all" ? "Matéria: todas" : `Matéria: ${categoryLabelMap[filterCat] || filterCat}`}
-              {" · "}
-              {filterTri === "all" ? "Trimestre: todos" : `Trimestre: ${trimesterLabelMap[filterTri] || filterTri}`}
-            </p>
-            <button
-              type="button"
-              onClick={() => openModal("filters")}
-              className="mt-1 text-xs tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors"
-            >
-              Ajustar filtros ({filtered.length})
-            </button>
+          <div className="text-right relative">
+            <div className="flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => toggleFilter("year")}
+                className="bg-stone-100 text-stone-800 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest hover:bg-stone-200 transition-colors"
+              >
+                {filterYear === "all" ? "Ano: todos" : `Ano: ${filterYear}`}
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleFilter("category")}
+                className="bg-stone-100 text-stone-800 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest hover:bg-stone-200 transition-colors"
+              >
+                {filterCat === "all" ? "Matéria: todas" : `Matéria: ${categoryLabelMap[filterCat] || filterCat}`}
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleFilter("trimester")}
+                className="bg-stone-100 text-stone-800 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest hover:bg-stone-200 transition-colors"
+              >
+                {filterTri === "all" ? "Trimestre: todos" : `Trimestre: ${trimesterLabelMap[filterTri] || filterTri}`}
+              </button>
+            </div>
+            <p className="mt-1 text-[10px] uppercase tracking-widest text-stone-600">{filtered.length} resultados</p>
           </div>
         </div>
 
         {/* Grid de projetos */}
         {filtered.length === 0 ? (
           <div className="text-center py-24">
-            <p className="text-stone-400 text-sm tracking-wide mb-4">Nenhum projeto encontrado</p>
+            <p className="text-stone-600 text-sm tracking-wide mb-4">Nenhum projeto encontrado</p>
             <Btn disabled={years.length === 0} onClick={openNewProjectForm}>
               + Criar primeiro projeto
             </Btn>
@@ -2166,7 +2185,7 @@ function Dashboard({ token, onLogout }) {
                     <span className="bg-stone-100 text-stone-600 px-2 py-1 text-[10px] uppercase tracking-widest font-medium">
                       {project.year}
                     </span>
-                    <span className="text-[10px] tracking-widest uppercase text-stone-400">
+                    <span className="text-[10px] tracking-widest uppercase text-stone-600">
                       {categoryLabelMap[project.categorySlug] || project.categorySlug} · {trimesterLabelMap[project.trimester] || project.trimester}
                     </span>
                   </div>
@@ -2195,7 +2214,7 @@ function Dashboard({ token, onLogout }) {
                         </span>
                       ))}
                       {project.skills.length > 3 && (
-                        <span className="text-[10px] text-stone-400 self-center uppercase tracking-widest">
+                        <span className="text-[10px] text-stone-600 self-center uppercase tracking-widest">
                           +{project.skills.length - 3}
                         </span>
                       )}
@@ -2203,7 +2222,7 @@ function Dashboard({ token, onLogout }) {
                   )}
                 </div>
 
-                <div className="flex gap-4 pt-4 border-t border-stone-100 mt-auto">
+                <div className="flex gap-4 pt-4 mt-auto">
                   <button
                     type="button"
                     onClick={() => setEditing({ ...project })}
@@ -2281,80 +2300,52 @@ function Dashboard({ token, onLogout }) {
         {toast && <Toast msg={toast.msg} type={toast.type} />}
       </AnimatePresence>
 
-      {/* MODALS */}
       <AnimatePresence>
-        {activeModal === "filters" && (
-          <ModalShell
-            title="Filtros"
-            onClose={closeModal}
-            footer={
-              <div className="flex gap-3">
-                <Btn
-                  variant="ghost"
-                  onClick={() => {
-                    setFilterYear("all");
-                    setFilterCat("all");
-                    setFilterTri("all");
-                  }}
-                >
-                  Limpar
-                </Btn>
-                <Btn className="ml-auto" onClick={closeModal}>
-                  Aplicar
-                </Btn>
-              </div>
-            }
+        {openFilter && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40"
+            onClick={closeFilter}
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="text-xs tracking-[0.15em] uppercase text-stone-500">Ano</label>
-                <select
-                  value={filterYear}
-                  onChange={(e) => setFilterYear(e.target.value)}
-                  className="mt-1 w-full bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:border-stone-900"
-                >
-                  <option value="all">Todos</option>
-                  {years.map((y) => (
-                    <option key={y} value={y}>
-                      {y}
-                    </option>
-                  ))}
-                </select>
+            <div
+              className="absolute right-8 top-[128px] w-64 bg-white shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="px-4 py-3 text-[10px] font-semibold uppercase tracking-widest text-stone-600">
+                {openFilter === "year" && "Ano"}
+                {openFilter === "category" && "Matéria"}
+                {openFilter === "trimester" && "Trimestre"}
               </div>
-
-              <div>
-                <label className="text-xs tracking-[0.15em] uppercase text-stone-500">Matéria</label>
-                <select
-                  value={filterCat}
-                  onChange={(e) => setFilterCat(e.target.value)}
-                  className="mt-1 w-full bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:border-stone-900"
-                >
-                  <option value="all">Todas</option>
-                  {categories.map((c) => (
-                    <option key={c.slug} value={c.slug}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-xs tracking-[0.15em] uppercase text-stone-500">Trimestre</label>
-                <select
-                  value={filterTri}
-                  onChange={(e) => setFilterTri(e.target.value)}
-                  className="mt-1 w-full bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:border-stone-900"
-                >
-                  <option value="all">Todos</option>
-                  {trimesters.map((t) => (
-                    <option key={t.key} value={t.key}>
-                      {t.label}
-                    </option>
-                  ))}
-                </select>
+              <div className="py-1 max-h-72 overflow-y-auto">
+                {openFilter === "year" && (
+                  <>
+                    <button type="button" onClick={() => { setFilterYear("all"); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm text-stone-900 hover:bg-stone-50">Todos</button>
+                    {years.map((y) => (
+                      <button key={y} type="button" onClick={() => { setFilterYear(y); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm text-stone-900 hover:bg-stone-50">{y}</button>
+                    ))}
+                  </>
+                )}
+                {openFilter === "category" && (
+                  <>
+                    <button type="button" onClick={() => { setFilterCat("all"); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm text-stone-900 hover:bg-stone-50">Todas</button>
+                    {categories.map((c) => (
+                      <button key={c.slug} type="button" onClick={() => { setFilterCat(c.slug); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm text-stone-900 hover:bg-stone-50">{c.label}</button>
+                    ))}
+                  </>
+                )}
+                {openFilter === "trimester" && (
+                  <>
+                    <button type="button" onClick={() => { setFilterTri("all"); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm text-stone-900 hover:bg-stone-50">Todos</button>
+                    {trimesters.map((t) => (
+                      <button key={t.key} type="button" onClick={() => { setFilterTri(t.key); closeFilter(); }} className="block w-full px-4 py-2 text-left text-sm text-stone-900 hover:bg-stone-50">{t.label}</button>
+                    ))}
+                  </>
+                )}
               </div>
             </div>
-          </ModalShell>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -2370,7 +2361,7 @@ function Dashboard({ token, onLogout }) {
                   value={newYearInput}
                   onChange={(e) => setNewYearInput(e.target.value)}
                   placeholder="Ex: 2027"
-                  className="w-28 bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900"
+                  className="w-28 bg-white px-3 py-2 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-300"
                 />
                 <Btn onClick={handleCreateYear} disabled={saving || !newYearInput.trim()}>
                   Adicionar
@@ -2390,7 +2381,7 @@ function Dashboard({ token, onLogout }) {
                   &times; {year}
                 </button>
               ))}
-              {years.length === 0 && <p className="text-sm text-stone-400">Nenhum ano cadastrado.</p>}
+              {years.length === 0 && <p className="text-sm text-stone-600">Nenhum ano cadastrado.</p>}
             </div>
           </ModalShell>
         )}
@@ -2408,14 +2399,14 @@ function Dashboard({ token, onLogout }) {
                   value={newCategoryLabel}
                   onChange={(e) => setNewCategoryLabel(e.target.value)}
                   placeholder="Nome"
-                  className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900"
+                  className="bg-white px-3 py-2 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-300"
                 />
                 <input
                   type="text"
                   value={newCategorySlug}
                   onChange={(e) => setNewCategorySlug(e.target.value)}
                   placeholder="slug (ex: biologia)"
-                  className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900"
+                  className="bg-white px-3 py-2 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-300"
                 />
                 <div className="flex gap-3">
                   <input
@@ -2423,7 +2414,7 @@ function Dashboard({ token, onLogout }) {
                     value={newCategoryPrefix}
                     onChange={(e) => setNewCategoryPrefix(e.target.value)}
                     placeholder="prefix"
-                    className="w-24 bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900"
+                    className="w-24 bg-white px-3 py-2 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-300"
                   />
                   <Btn
                     className="ml-auto"
@@ -2444,7 +2435,7 @@ function Dashboard({ token, onLogout }) {
           >
             <div className="space-y-2">
               {categories.map((c) => (
-                <div key={c.slug} className="flex items-center justify-between gap-4 bg-stone-50 border border-stone-100 px-4 py-3">
+                <div key={c.slug} className="flex items-center justify-between gap-4 bg-stone-50 px-4 py-3">
                   <div>
                     <p className="text-sm text-stone-900 font-medium">{c.label}</p>
                     <p className="text-xs text-stone-500 font-mono">{c.slug}</p>
@@ -2458,7 +2449,7 @@ function Dashboard({ token, onLogout }) {
                   </button>
                 </div>
               ))}
-              {categories.length === 0 && <p className="text-sm text-stone-400">Nenhuma matéria cadastrada.</p>}
+              {categories.length === 0 && <p className="text-sm text-stone-600">Nenhuma matéria cadastrada.</p>}
             </div>
           </ModalShell>
         )}
@@ -2476,14 +2467,14 @@ function Dashboard({ token, onLogout }) {
                   value={newTrimesterKey}
                   onChange={(e) => setNewTrimesterKey(e.target.value)}
                   placeholder="Número (ex: 4)"
-                  className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900"
+                  className="bg-white px-3 py-2 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-300"
                 />
                 <input
                   type="text"
                   value={newTrimesterLabel}
                   onChange={(e) => setNewTrimesterLabel(e.target.value)}
                   placeholder="Label (ex: 4º Trimestre)"
-                  className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900"
+                  className="bg-white px-3 py-2 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-300"
                 />
                 <Btn
                   onClick={() => handleAddTrimester({ key: newTrimesterKey, label: newTrimesterLabel })}
@@ -2496,7 +2487,7 @@ function Dashboard({ token, onLogout }) {
           >
             <div className="space-y-2">
               {trimesters.map((t) => (
-                <div key={t.key} className="flex items-center justify-between gap-4 bg-stone-50 border border-stone-100 px-4 py-3">
+                <div key={t.key} className="flex items-center justify-between gap-4 bg-stone-50 px-4 py-3">
                   <div>
                     <p className="text-sm text-stone-900 font-medium">{t.label}</p>
                     <p className="text-xs text-stone-500 font-mono">{t.key}</p>
@@ -2531,7 +2522,7 @@ function Dashboard({ token, onLogout }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[2px]"
+            className="fixed inset-0 z-40 bg-stone-200/40 backdrop-blur-[2px]"
             onClick={closeFab}
           />
         )}
@@ -2545,11 +2536,8 @@ function Dashboard({ token, onLogout }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
               transition={{ duration: 0.16, ease: "easeOut" }}
-              className="mb-3 w-64 bg-white border border-stone-200 shadow-2xl"
+              className="mb-3 w-64 bg-white shadow-2xl"
             >
-              <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-stone-400">
-                Ações
-              </div>
               <div className="py-1">
                 <FabActionButton
                   marker="P"
@@ -2563,10 +2551,6 @@ function Dashboard({ token, onLogout }) {
                 <FabActionButton marker="T" label="Gerenciar trimestres" onClick={() => openModal("trimesters")} />
                 <FabActionButton marker="M" label="Matérias" onClick={() => openModal("categories")} />
               </div>
-              <div className="h-px bg-stone-100" />
-              <div className="py-1">
-                <FabActionButton marker="F" label="Filtros" subdued onClick={() => openModal("filters")} />
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -2574,9 +2558,8 @@ function Dashboard({ token, onLogout }) {
         <button
           type="button"
           onClick={() => setFabOpen((v) => !v)}
-          className="h-14 w-14 bg-stone-900 text-white shadow-xl border border-stone-900 hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-900 focus:ring-offset-2"
+          className="h-14 w-14 bg-stone-100 text-stone-800 shadow-xl hover:bg-stone-200 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-700 focus:ring-offset-2"
           aria-label="Menu de ações"
-          title="Ações"
         >
           <motion.svg
             width="24"
