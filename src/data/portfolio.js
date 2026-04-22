@@ -3,35 +3,68 @@ const dataModules = import.meta.glob('../../assets/data/*/*.json', {
   import: 'default',
 });
 
+const metaModules = import.meta.glob('../../assets/data/_meta.json', {
+  eager: true,
+  import: 'default',
+});
+
 const mediaModules = import.meta.glob('../../assets/images/**/*.{webp,png,jpg,jpeg,avif,gif,mp4,webm,ogg,mov}', {
   eager: true,
   import: 'default',
 });
 
-const categoryMetadata = [
-  {
-    categoria: 'Ciências Humanas',
-    slug: 'ciencias-humanas',
-  },
-  {
-    categoria: 'Ciências Natureza',
-    slug: 'ciencias-natureza',
-  },
-  {
-    categoria: 'Linguagens',
-    slug: 'linguagens',
-  },
-  {
-    categoria: 'Matemática',
-    slug: 'matematica',
-  },
-];
-
-const emptyYearTemplate = {
-  '1': [],
-  '2': [],
-  '3': [],
+const DEFAULT_META = {
+  categories: [
+    { slug: 'ciencias-humanas', label: 'Ciências Humanas' },
+    { slug: 'ciencias-natureza', label: 'Ciências Natureza' },
+    { slug: 'linguagens', label: 'Linguagens' },
+    { slug: 'matematica', label: 'Matemática' },
+  ],
+  trimesters: [
+    { key: '1', label: '1º Trimestre' },
+    { key: '2', label: '2º Trimestre' },
+    { key: '3', label: '3º Trimestre' },
+  ],
 };
+
+const normalizeMeta = (raw) => {
+  const categories = Array.isArray(raw?.categories)
+    ? raw.categories
+      .map((category) => ({
+        slug: String(category?.slug || '').trim(),
+        label: String(category?.label || '').trim(),
+      }))
+      .filter((category) => category.slug && category.label)
+    : [];
+
+  const trimesters = Array.isArray(raw?.trimesters)
+    ? raw.trimesters
+      .map((trimester) => ({
+        key: String(trimester?.key || '').trim(),
+        label: String(trimester?.label || '').trim(),
+      }))
+      .filter((trimester) => trimester.key && trimester.label)
+    : [];
+
+  return {
+    categories: categories.length > 0 ? categories : DEFAULT_META.categories,
+    trimesters: trimesters.length > 0 ? trimesters : DEFAULT_META.trimesters,
+  };
+};
+
+const rawMeta = metaModules['../../assets/data/_meta.json'];
+const normalizedMeta = normalizeMeta(rawMeta);
+
+const categoryMetadata = normalizedMeta.categories.map((category) => ({
+  categoria: category.label,
+  slug: category.slug,
+}));
+
+const trimestersMeta = normalizedMeta.trimesters;
+
+const emptyYearTemplate = Object.fromEntries(
+  trimestersMeta.map((trimester) => [trimester.key, []]),
+);
 
 const yearlyRawData = Object.entries(dataModules).reduce((acc, [path, content]) => {
   const match = path.match(/\/assets\/data\/(\d{4})\/([^/]+)\.json$/);
@@ -115,13 +148,11 @@ const normalizeTrabalho = (trabalho) => ({
   ),
 });
 
-const normalizeTrimestres = (trimestresRaw) =>
-  Object.entries(trimestresRaw)
-    .map(([numero, trabalhos]) => ({
-      numero: Number(numero),
-      trabalhos: trabalhos.map(normalizeTrabalho),
-    }))
-    .sort((a, b) => a.numero - b.numero);
+const normalizeTrimestres = (trimestresRaw = {}) =>
+  trimestersMeta.map((trimester) => ({
+    numero: Number(trimester.key),
+    trabalhos: (trimestresRaw[trimester.key] || []).map(normalizeTrabalho),
+  }));
 
 const createPortfolioForYear = (year) =>
   categoryMetadata.map((category) => ({
@@ -155,8 +186,10 @@ export const getCategoryBySlug = (year, slug) => {
 export const getTrimester = (year, categorySlug, trimesterNumber) => {
   const category = getCategoryBySlug(year, categorySlug);
   if (!category) return null;
-  return category.trimestres.find((t) => t.numero === parseInt(trimesterNumber));
+  return category.trimestres.find((t) => t.numero === Number.parseInt(trimesterNumber, 10));
 };
+
+export const getTrimestersMeta = () => trimestersMeta;
 
 export const getTotalWorks = (year) => {
   return getPortfolioByYear(year).reduce((total, category) => {

@@ -5,35 +5,69 @@ const REPO_OWNER = "vinisebold";
 const REPO_NAME = "senai-portfolio-26";
 const BRANCH = "main";
 
-const CATEGORY_META = [
-  { slug: "ciencias-humanas", label: "Ciências Humanas", idPrefix: "ch" },
-  { slug: "ciencias-natureza", label: "Ciências Natureza", idPrefix: "cn" },
-  { slug: "linguagens", label: "Linguagens", idPrefix: "ling" },
-  { slug: "matematica", label: "Matemática", idPrefix: "mat" },
-];
+const META_PATH = "assets/data/_meta.json";
 
-const TRIMESTERS = ["1", "2", "3"];
-const EMPTY_TRIMESTER_TEMPLATE = { "1": [], "2": [], "3": [] };
+const DEFAULT_META = {
+  categories: [
+    { slug: "ciencias-humanas", label: "Ciências Humanas", idPrefix: "ch" },
+    { slug: "ciencias-natureza", label: "Ciências Natureza", idPrefix: "cn" },
+    { slug: "linguagens", label: "Linguagens", idPrefix: "ling" },
+    { slug: "matematica", label: "Matemática", idPrefix: "mat" },
+  ],
+  trimesters: [
+    { key: "1", label: "1º Trimestre" },
+    { key: "2", label: "2º Trimestre" },
+    { key: "3", label: "3º Trimestre" },
+  ],
+};
+
+function normalizeMeta(raw) {
+  const safe = raw && typeof raw === "object" ? raw : {};
+  const categories = Array.isArray(safe.categories) ? safe.categories : DEFAULT_META.categories;
+  const trimesters = Array.isArray(safe.trimesters) ? safe.trimesters : DEFAULT_META.trimesters;
+
+  const cleanCategories = categories
+    .map((c) => ({
+      slug: trim(c?.slug).toLowerCase(),
+      label: trim(c?.label) || trim(c?.slug),
+      idPrefix: trim(c?.idPrefix).toLowerCase() || "proj",
+    }))
+    .filter((c) => /^[a-z0-9-]+$/.test(c.slug) && c.label)
+    .filter((c, idx, arr) => arr.findIndex((x) => x.slug === c.slug) === idx);
+
+  const cleanTrimesters = trimesters
+    .map((t) => ({
+      key: trim(t?.key),
+      label: trim(t?.label) || trim(t?.key),
+    }))
+    .filter((t) => t.key && t.label)
+    .filter((t, idx, arr) => arr.findIndex((x) => x.key === t.key) === idx)
+    .sort((a, b) => {
+      const na = Number(a.key);
+      const nb = Number(b.key);
+      if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+      return String(a.key).localeCompare(String(b.key));
+    });
+
+  return {
+    categories: cleanCategories.length ? cleanCategories : DEFAULT_META.categories,
+    trimesters: cleanTrimesters.length ? cleanTrimesters : DEFAULT_META.trimesters,
+  };
+}
 
 function sortYears(years) {
   return [...new Set(years)].sort((first, second) => Number(first) - Number(second));
 }
 
-function buildDataFiles(years) {
+function buildDataFiles(years, categories) {
   return years.flatMap((year) =>
-    CATEGORY_META.map(({ slug }) => ({
+    categories.map(({ slug }) => ({
       year,
       slug,
       path: `assets/data/${year}/${slug}.json`,
     })),
   );
 }
-
-const TRIMESTER_LABELS = {
-  "1": "1º Trimestre",
-  "2": "2º Trimestre",
-  "3": "3º Trimestre",
-};
 
 // Try to resolve bundled asset paths to their final (hashed) URLs at build time.
 // This mirrors the logic used by the public site so the admin can display
@@ -83,28 +117,42 @@ function resolveBundledMedia(src) {
 
 const trim = (value) => (typeof value === "string" ? value.trim() : "");
 
-function getCategoryLabel(slug) {
-  return CATEGORY_META.find((item) => item.slug === slug)?.label || slug;
+function getCategoryLabel(slug, categories = DEFAULT_META.categories) {
+  return categories.find((item) => item.slug === slug)?.label || slug;
 }
 
-function getCategoryPrefix(slug) {
-  return CATEGORY_META.find((item) => item.slug === slug)?.idPrefix || "proj";
+function getCategoryPrefix(slug, categories = DEFAULT_META.categories) {
+  return categories.find((item) => item.slug === slug)?.idPrefix || "proj";
 }
 
 function getDataFilePath(year, categorySlug) {
   return `assets/data/${year}/${categorySlug}.json`;
 }
 
-function generateProjectId(categorySlug) {
-  return `${getCategoryPrefix(categorySlug)}-${Date.now()}`;
+function generateProjectId(categorySlug, categories = DEFAULT_META.categories) {
+  return `${getCategoryPrefix(categorySlug, categories)}-${Date.now()}`;
 }
 
-function normalizeProject(project, availableYears = []) {
+function normalizeProject(
+  project,
+  availableYears = [],
+  {
+    categories = DEFAULT_META.categories,
+    trimesterKeys = DEFAULT_META.trimesters.map((t) => t.key),
+  } = {},
+) {
   const normalizedYears = sortYears(availableYears);
   const fallbackYear = normalizedYears[0] || String(new Date().getFullYear());
+  const fallbackCategory = categories[0]?.slug || DEFAULT_META.categories[0].slug;
+  const fallbackTrimester = trimesterKeys[0] || DEFAULT_META.trimesters[0].key;
+
+  const categorySlug = trim(project.categorySlug) || fallbackCategory;
+  const trimester = trim(project.trimester) || fallbackTrimester;
+  const isKnownCategory = categories.some((c) => c.slug === categorySlug);
+  const isKnownTrimester = trimesterKeys.includes(trimester);
 
   return {
-    id: trim(project.id) || generateProjectId(project.categorySlug),
+    id: trim(project.id) || generateProjectId(categorySlug, categories),
     title: trim(project.title),
     description: trim(project.description),
     skills: Array.isArray(project.skills)
@@ -115,10 +163,8 @@ function normalizeProject(project, availableYears = []) {
       : [],
     link: trim(project.link),
     year: normalizedYears.includes(project.year) ? project.year : fallbackYear,
-    categorySlug: CATEGORY_META.some((category) => category.slug === project.categorySlug)
-      ? project.categorySlug
-      : CATEGORY_META[0].slug,
-    trimester: TRIMESTERS.includes(project.trimester) ? project.trimester : "1",
+    categorySlug: isKnownCategory ? categorySlug : fallbackCategory,
+    trimester: isKnownTrimester ? trimester : fallbackTrimester,
     sortKey:
       typeof project.sortKey === "number"
         ? project.sortKey
@@ -126,15 +172,30 @@ function normalizeProject(project, availableYears = []) {
   };
 }
 
-function flattenPortfolioFiles(fileMap, years) {
+function normalizeTrimesterTemplate(data, trimesterKeys) {
+  const keys = Array.isArray(trimesterKeys) && trimesterKeys.length
+    ? trimesterKeys
+    : DEFAULT_META.trimesters.map((t) => t.key);
+
+  const safe = data && typeof data === "object" ? data : {};
+  const out = Object.fromEntries(keys.map((k) => [k, Array.isArray(safe[k]) ? safe[k] : []]));
+
+  // Preserve any additional keys already present (to avoid destructive writes)
+  for (const [k, v] of Object.entries(safe)) {
+    if (!(k in out)) out[k] = Array.isArray(v) ? v : [];
+  }
+  return out;
+}
+
+function flattenPortfolioFiles(fileMap, years, categories, trimesterKeys) {
   const projects = [];
-  const dataFiles = buildDataFiles(years);
+  const dataFiles = buildDataFiles(years, categories);
 
   for (const file of dataFiles) {
     const fileContent = fileMap[file.path];
-    const trimesters = fileContent?.data || EMPTY_TRIMESTER_TEMPLATE;
+    const trimesters = fileContent?.data || {};
 
-    TRIMESTERS.forEach((trimester) => {
+    trimesterKeys.forEach((trimester) => {
       const items = Array.isArray(trimesters?.[trimester]) ? trimesters[trimester] : [];
       items.forEach((item, index) => {
         projects.push(
@@ -158,18 +219,22 @@ function flattenPortfolioFiles(fileMap, years) {
   return projects;
 }
 
-function toCategoryFileData(projects, year, categorySlug) {
-  const grouped = { "1": [], "2": [], "3": [] };
+function toCategoryFileData(projects, year, categorySlug, trimesterKeys) {
+  const grouped = Object.fromEntries(trimesterKeys.map((key) => [key, []]));
 
   projects
     .filter((project) => project.year === year && project.categorySlug === categorySlug)
     .sort((first, second) => {
       if (first.trimester !== second.trimester) {
-        return Number(first.trimester) - Number(second.trimester);
+        const na = Number(first.trimester);
+        const nb = Number(second.trimester);
+        if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+        return String(first.trimester).localeCompare(String(second.trimester));
       }
       return first.sortKey - second.sortKey;
     })
     .forEach((project) => {
+      if (!grouped[project.trimester]) grouped[project.trimester] = [];
       grouped[project.trimester].push({
         id: trim(project.id),
         tema: trim(project.title),
@@ -189,6 +254,11 @@ function toCategoryFileData(projects, year, categorySlug) {
 
 function serializeCategoryFile(data) {
   return `${JSON.stringify(data, null, 2)}\n`;
+}
+
+function serializeMetaFile(meta) {
+  const normalized = normalizeMeta(meta);
+  return `${JSON.stringify(normalized, null, 2)}\n`;
 }
 
 // ─── AUDITORIA / LOGS ────────────────────────────────────────────────────────
@@ -310,12 +380,18 @@ async function fetchJsonFile(token, path) {
       return {
         path,
         sha: null,
-        data: { ...EMPTY_TRIMESTER_TEMPLATE },
+        data: {},
         exists: false,
       };
     }
     throw error;
   }
+}
+
+async function fetchMetaFile(token) {
+  const fetched = await fetchJsonFile(token, META_PATH);
+  const meta = normalizeMeta(fetched.data);
+  return { meta, sha: fetched.sha, exists: fetched.exists };
 }
 
 async function fetchAvailableYears(token) {
@@ -497,9 +573,9 @@ async function uploadMedia(token, file, path, onAttempt = null) {
   });
 }
 
-function buildEmptyProject(defaultYear, defaultCategory = CATEGORY_META[0].slug) {
+function buildEmptyProject(defaultYear, defaultCategory, defaultTrimester, categories = DEFAULT_META.categories) {
   return {
-    id: generateProjectId(defaultCategory),
+    id: generateProjectId(defaultCategory, categories),
     title: "",
     description: "",
     skills: [],
@@ -507,7 +583,7 @@ function buildEmptyProject(defaultYear, defaultCategory = CATEGORY_META[0].slug)
     link: "",
     year: defaultYear,
     categorySlug: defaultCategory,
-    trimester: "1",
+    trimester: defaultTrimester,
     sortKey: Number.MAX_SAFE_INTEGER,
   };
 }
@@ -719,7 +795,7 @@ function Input({ label, value, onChange, placeholder, type = "text", required })
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
-        className="bg-transparent border-b border-stone-300 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
+        className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
       />
     </div>
   );
@@ -732,7 +808,7 @@ function Select({ label, value, onChange, options }) {
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="bg-transparent border-b border-stone-300 py-2 text-sm text-stone-900 focus:outline-none focus:border-stone-900 transition-colors"
+        className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:border-stone-900 transition-colors cursor-pointer"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -744,13 +820,13 @@ function Select({ label, value, onChange, options }) {
   );
 }
 
-function Btn({ children, onClick, variant = "primary", disabled, small, type = "button" }) {
+function Btn({ children, onClick, variant = "primary", disabled, small, type = "button", className = "" }) {
   const base =
-    "tracking-[0.1em] uppercase text-xs transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed";
+    "tracking-[0.1em] uppercase text-xs transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed font-medium rounded-none";
   const variants = {
-    primary: `bg-stone-900 text-white ${small ? "px-4 py-2" : "px-8 py-3"} hover:bg-stone-700`,
-    ghost: `border border-stone-300 text-stone-700 ${small ? "px-4 py-2" : "px-8 py-3"} hover:border-stone-900 hover:text-stone-900`,
-    danger: `border border-red-300 text-red-600 ${small ? "px-4 py-2" : "px-8 py-3"} hover:bg-red-50`,
+    primary: `bg-stone-900 text-white ${small ? "px-4 py-2" : "px-8 py-3"} hover:bg-stone-800`,
+    ghost: `bg-stone-100 text-stone-800 ${small ? "px-4 py-2" : "px-8 py-3"} hover:bg-stone-200 hover:text-stone-900`,
+    danger: `bg-red-50 text-red-600 ${small ? "px-4 py-2" : "px-8 py-3"} hover:bg-red-100`,
   };
 
   return (
@@ -758,7 +834,7 @@ function Btn({ children, onClick, variant = "primary", disabled, small, type = "
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`${base} ${variants[variant]}`}
+      className={`${base} ${variants[variant]} ${className}`}
     >
       {children}
     </button>
@@ -776,12 +852,33 @@ function Toast({ msg, type }) {
         type === "error"
           ? "bg-red-600 text-white"
           : type === "warning"
-          ? "bg-amber-500 text-white"
+          ? "bg-amber-200 text-stone-900"
           : "bg-stone-900 text-white"
       }`}
     >
       {msg}
     </motion.div>
+  );
+}
+
+function FabActionButton({ label, marker, onClick, subdued }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 hover:text-stone-900 focus:bg-stone-50 focus:outline-none"
+    >
+      <span
+        className={`flex h-6 w-6 items-center justify-center text-[10px] font-bold tracking-widest border border-stone-200 transition-colors ${
+          subdued
+            ? "bg-stone-100 text-stone-500 group-hover:bg-stone-200"
+            : "bg-stone-100 text-stone-600 group-hover:bg-stone-900 group-hover:text-white group-hover:border-stone-900"
+        }`}
+      >
+        {marker}
+      </span>
+      {label}
+    </button>
   );
 }
 
@@ -804,7 +901,7 @@ function ProgressBar({ progress, label, visible }) {
               transition={{ duration: 0.4, ease: "easeOut" }}
             />
           </div>
-          <div className="max-w-6xl mx-auto px-8 py-2 flex items-center gap-3">
+          <div className="max-w-[1400px] mx-auto px-8 py-2 flex items-center gap-3">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -979,6 +1076,47 @@ function ConfirmModal({ title, description, confirmLabel = "Confirmar", variant 
   );
 }
 
+function ModalShell({ title, onClose, children, footer }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center px-6"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.98, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.98, opacity: 0 }}
+        transition={{ duration: 0.18, ease: "easeOut" }}
+        className="bg-white w-full max-w-xl shadow-2xl border border-stone-100"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="px-8 py-6 border-b border-stone-100 flex items-start justify-between gap-6">
+          <div>
+            <p className="text-xs tracking-[0.3em] uppercase text-stone-400">Admin</p>
+            <h3 className="text-lg font-light text-stone-900" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              {title}
+            </h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-xs tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors"
+          >
+            Fechar
+          </button>
+        </div>
+
+        <div className="px-8 py-6">{children}</div>
+
+        {footer && <div className="px-8 py-5 border-t border-stone-100 bg-white">{footer}</div>}
+      </motion.div>
+    </motion.div>
+  );
+}
+
 // ─── LOGIN ────────────────────────────────────────────────────────────────────
 function LoginScreen({ onLogin }) {
   const [token, setToken] = useState("");
@@ -1030,11 +1168,8 @@ function LoginScreen({ onLogin }) {
               value={token}
               onChange={(e) => setToken(e.target.value)}
               placeholder="github_pat_..."
-              className="bg-transparent border-b border-stone-300 py-3 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
+              className="bg-stone-50 border border-stone-200 px-3 py-3 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
             />
-            <p className="text-xs text-stone-400 mt-1">
-              Fine-grained PAT com permissão <span className="font-medium">Contents: Read &amp; Write</span>
-            </p>
           </div>
 
           {error && <p className="text-xs text-red-600 tracking-wide">{error}</p>}
@@ -1043,22 +1178,26 @@ function LoginScreen({ onLogin }) {
             {loading ? "Verificando..." : "Entrar"}
           </Btn>
         </form>
-
-        <p className="mt-8 text-xs text-stone-400 leading-relaxed">
-          O token é armazenado apenas na memória desta sessão e descartado ao fechar o navegador.
-        </p>
       </motion.div>
     </div>
   );
 }
 
 // ─── PROJECT FORM ─────────────────────────────────────────────────────────────
-function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
-  const [form, setForm] = useState(() => normalizeProject(project, years));
+function ProjectForm({ project, onSave, onCancel, token, saving, years, categories, trimesters }) {
+  const trimesterKeys = useMemo(() => (trimesters || []).map((t) => t.key), [trimesters]);
+  const [form, setForm] = useState(() =>
+    normalizeProject(project, years, { categories, trimesterKeys }),
+  );
   const [skillInput, setSkillInput] = useState("");
   const [imageInput, setImageInput] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(null);
+
+  const trimesterLabelMap = useMemo(
+    () => Object.fromEntries((trimesters || []).map((t) => [t.key, t.label])),
+    [trimesters],
+  );
 
   // Confirmação de remoção de imagem
   const [imageRemoveConfirm, setImageRemoveConfirm] = useState(null); // index
@@ -1163,7 +1302,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
 
   function handleSubmit(event) {
     event.preventDefault();
-    onSave(normalizeProject(form, years));
+    onSave(normalizeProject(form, years, { categories, trimesterKeys }));
   }
 
   return (
@@ -1236,7 +1375,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
                 onChange={(e) => set("description", e.target.value)}
                 rows={4}
                 placeholder="Descreva o projeto..."
-                className="bg-transparent border-b border-stone-300 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors resize-none"
+                className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors resize-none"
               />
             </div>
           </div>
@@ -1252,7 +1391,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
               label="Categoria"
               value={form.categorySlug}
               onChange={(v) => set("categorySlug", v)}
-              options={CATEGORY_META.map((category) => ({
+              options={(categories || []).map((category) => ({
                 value: category.slug,
                 label: category.label,
               }))}
@@ -1263,9 +1402,9 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
             label="Trimestre"
             value={form.trimester}
             onChange={(v) => set("trimester", v)}
-            options={TRIMESTERS.map((trimester) => ({
-              value: trimester,
-              label: TRIMESTER_LABELS[trimester],
+            options={(trimesters || []).map((t) => ({
+              value: t.key,
+              label: trimesterLabelMap[t.key] || t.label || t.key,
             }))}
           />
 
@@ -1284,7 +1423,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
                   }
                 }}
                 placeholder="Ex: Biologia, Cálculo..."
-                className="flex-1 bg-transparent border-b border-stone-300 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
+                className="flex-1 bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
               />
               <Btn small onClick={addSkill} variant="ghost">
                 Adicionar
@@ -1292,19 +1431,19 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
             </div>
             <div className="flex flex-wrap gap-2 mt-1">
               {form.skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="flex items-center gap-1 text-xs tracking-wide border border-stone-300 px-3 py-1 text-stone-700"
-                >
-                  {skill}
-                  <button
-                    type="button"
-                    onClick={() => removeSkill(skill)}
-                    className="ml-1 text-stone-400 hover:text-red-500 text-base leading-none"
+                  <span
+                    key={skill}
+                    className="flex items-center gap-1 text-xs uppercase tracking-widest font-medium bg-stone-100 px-3 py-1 text-stone-700"
                   >
-                    &times;
-                  </button>
-                </span>
+                    {skill}
+                    <button
+                      type="button"
+                      onClick={() => removeSkill(skill)}
+                      className="ml-1 text-stone-400 hover:text-red-500 text-base leading-none transition-colors"
+                    >
+                      &times;
+                    </button>
+                  </span>
               ))}
             </div>
           </div>
@@ -1325,7 +1464,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
                   }
                 }}
                 placeholder="https://... ou URL de mídia"
-                className="flex-1 bg-transparent border-b border-stone-300 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
+                className="flex-1 bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
               />
               <Btn small onClick={addImageUrl} variant="ghost">
                 + URL
@@ -1334,7 +1473,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
 
             <div className="flex items-center gap-3">
               <label
-                className={`cursor-pointer text-xs tracking-[0.1em] uppercase border border-stone-300 px-4 py-2 text-stone-700 hover:border-stone-900 hover:text-stone-900 transition-all ${
+                className={`cursor-pointer text-xs tracking-[0.1em] uppercase bg-stone-50 text-stone-700 px-4 py-2 hover:bg-stone-200 hover:text-stone-900 transition-colors font-medium ${
                   uploading ? "opacity-40 pointer-events-none" : ""
                 }`}
               >
@@ -1393,7 +1532,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
         {imageRemoveConfirm !== null && (
           <ConfirmModal
             title="Remover imagem?"
-            description="A imagem será removida da lista do projeto. O arquivo no repositório não é apagado automaticamente."
+            description="A imagem será removida do projeto."
             confirmLabel="Remover"
             variant="danger"
             onConfirm={confirmRemoveImage}
@@ -1407,7 +1546,7 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
         {imageOverwriteConfirm && (
           <ConfirmModal
             title="Sobrescrever imagem?"
-            description="Já existe uma imagem com este nome no repositório. Deseja substituí-la?"
+            description="Já existe uma imagem com este nome. Deseja substituir?"
             confirmLabel="Substituir"
             variant="danger"
             onConfirm={async () => {
@@ -1425,6 +1564,9 @@ function ProjectForm({ project, onSave, onCancel, token, saving, years }) {
 
 // ─── DASHBOARD ────────────────────────────────────────────────────────────────
 function Dashboard({ token, onLogout }) {
+  const [meta, setMeta] = useState(DEFAULT_META);
+  const [metaInfo, setMetaInfo] = useState({ sha: null, exists: false });
+
   const [years, setYears] = useState([]);
   const [projects, setProjects] = useState([]);
   const [fileState, setFileState] = useState({});
@@ -1439,6 +1581,44 @@ function Dashboard({ token, onLogout }) {
   const [filterTri, setFilterTri] = useState("all");
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [showAuditLog, setShowAuditLog] = useState(false);
+
+  // FAB + modals
+  const [fabOpen, setFabOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState(null); // 'filters' | 'years' | 'categories' | 'trimesters'
+  const [categoryToRemove, setCategoryToRemove] = useState(null);
+
+  const [newCategoryLabel, setNewCategoryLabel] = useState("");
+  const [newCategorySlug, setNewCategorySlug] = useState("");
+  const [newCategoryPrefix, setNewCategoryPrefix] = useState("");
+
+  const [newTrimesterKey, setNewTrimesterKey] = useState("");
+  const [newTrimesterLabel, setNewTrimesterLabel] = useState("");
+
+  const categories = meta.categories;
+  const trimesters = meta.trimesters;
+  const trimesterKeys = useMemo(() => trimesters.map((t) => t.key), [trimesters]);
+
+  const categoryLabelMap = useMemo(
+    () => Object.fromEntries(categories.map((c) => [c.slug, c.label])),
+    [categories],
+  );
+  const trimesterLabelMap = useMemo(
+    () => Object.fromEntries(trimesters.map((t) => [t.key, t.label])),
+    [trimesters],
+  );
+
+  function closeFab() {
+    setFabOpen(false);
+  }
+
+  function openModal(kind) {
+    closeFab();
+    setActiveModal(kind);
+  }
+
+  function closeModal() {
+    setActiveModal(null);
+  }
 
   // Progresso de operações longas
   const [progress, setProgress] = useState({ visible: false, value: 0, label: "" });
@@ -1472,8 +1652,12 @@ function Dashboard({ token, onLogout }) {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
+      const metaFetched = await fetchMetaFile(token);
+      setMeta(metaFetched.meta);
+      setMetaInfo({ sha: metaFetched.sha, exists: metaFetched.exists });
+
       const nextYears = await fetchAvailableYears(token);
-      const dataFiles = buildDataFiles(nextYears);
+      const dataFiles = buildDataFiles(nextYears, metaFetched.meta.categories);
       const files = await Promise.all(
         dataFiles.map(async (file) => {
           const fetched = await fetchJsonFile(token, file.path);
@@ -1487,7 +1671,14 @@ function Dashboard({ token, onLogout }) {
       const nextFileState = Object.fromEntries(files);
       setYears(nextYears);
       setFileState(nextFileState);
-      setProjects(flattenPortfolioFiles(nextFileState, nextYears));
+      setProjects(
+        flattenPortfolioFiles(
+          nextFileState,
+          nextYears,
+          metaFetched.meta.categories,
+          metaFetched.meta.trimesters.map((t) => t.key),
+        ),
+      );
     } catch (error) {
       showToast(`Erro ao carregar dados: ${error.message}`, "error");
       setYears([]);
@@ -1506,15 +1697,19 @@ function Dashboard({ token, onLogout }) {
   async function persistProjects(nextProjects, commitMsg) {
     setSaving(true);
 
-    const dataFiles = buildDataFiles(years);
+    const dataFiles = buildDataFiles(years, categories);
     const normalized = nextProjects.map((project, index) =>
-      normalizeProject({ ...project, sortKey: index }, years),
+      normalizeProject(
+        { ...project, sortKey: index },
+        years,
+        { categories, trimesterKeys },
+      ),
     );
 
     // 1. Calcula o novo conteúdo de cada arquivo
     const allPayloads = dataFiles.map((file) => {
       const path = getDataFilePath(file.year, file.slug);
-      const data = toCategoryFileData(normalized, file.year, file.slug);
+      const data = toCategoryFileData(normalized, file.year, file.slug, trimesterKeys);
       const content = serializeCategoryFile(data);
       return { path, data, content };
     });
@@ -1580,7 +1775,7 @@ function Dashboard({ token, onLogout }) {
   }
 
   async function handleSaveProject(form) {
-    const sanitized = normalizeProject(form, years);
+    const sanitized = normalizeProject(form, years, { categories, trimesterKeys });
     const exists = projects.some((project) => project.id === sanitized.id);
 
     const nextProjects = exists
@@ -1629,8 +1824,9 @@ function Dashboard({ token, onLogout }) {
     setSaving(true);
     updateProgress(30, `Criando ano ${year}...`);
     try {
-      const emptyContent = serializeCategoryFile(EMPTY_TRIMESTER_TEMPLATE);
-      const files = CATEGORY_META.map(({ slug }) => ({
+      const emptyTemplate = Object.fromEntries(trimesterKeys.map((key) => [key, []]));
+      const emptyContent = serializeCategoryFile(emptyTemplate);
+      const files = categories.map(({ slug }) => ({
         path: getDataFilePath(year, slug),
         content: emptyContent,
       }));
@@ -1670,7 +1866,7 @@ function Dashboard({ token, onLogout }) {
         `/repos/${REPO_OWNER}/${REPO_NAME}/git/trees`,
         {
           base_tree: headSha,
-          tree: CATEGORY_META.map(({ slug }) => ({
+          tree: categories.map(({ slug }) => ({
             path: getDataFilePath(year, slug),
             mode: "100644",
             type: "blob",
@@ -1700,8 +1896,158 @@ function Dashboard({ token, onLogout }) {
 
   function openNewProjectForm() {
     const year = years[years.length - 1];
-    const category = filterCat !== "all" ? filterCat : CATEGORY_META[0].slug;
-    setEditing(buildEmptyProject(year, category));
+    const defaultCategory = categories[0]?.slug || DEFAULT_META.categories[0].slug;
+    const defaultTrimester = trimesterKeys[0] || DEFAULT_META.trimesters[0].key;
+    const category = filterCat !== "all" ? filterCat : defaultCategory;
+    const trimester = filterTri !== "all" ? filterTri : defaultTrimester;
+    setEditing(buildEmptyProject(year, category, trimester, categories));
+  }
+
+  async function persistMetaAndFiles({ nextMeta, nextFileStatePatch = {}, commitMsg }) {
+    setSaving(true);
+    updateProgress(20, "Preparando alterações...");
+
+    const metaContent = serializeMetaFile(nextMeta);
+    const files = [{ path: META_PATH, content: metaContent }];
+
+    for (const [path, data] of Object.entries(nextFileStatePatch)) {
+      files.push({ path, content: serializeCategoryFile(data) });
+    }
+
+    try {
+      updateProgress(60, "Criando commit...");
+      const commitSha = await atomicCommit(token, files, commitMsg);
+
+      appendAuditLog({
+        action: "update",
+        path: files.map((f) => f.path.split("/").slice(-2).join("/")).join(", "),
+        message: commitMsg,
+      });
+
+      updateProgress(100, "Atualizado!");
+      clearProgress();
+
+      // Recarrega para garantir consistência (evita manter estados divergentes)
+      await loadData();
+      return commitSha;
+    } catch (error) {
+      clearProgress();
+      showToast(`Erro ao atualizar: ${error.message}`, "error");
+      return null;
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleAddCategory({ slug, label, idPrefix }) {
+    const cleanSlug = trim(slug).toLowerCase();
+    const cleanLabel = trim(label);
+    const cleanPrefix = trim(idPrefix).toLowerCase();
+
+    if (!/^[a-z0-9-]+$/.test(cleanSlug)) {
+      showToast("Slug inválido. Use letras, números e hífen.", "error");
+      return;
+    }
+    if (!cleanLabel) {
+      showToast("Informe um nome para a matéria.", "error");
+      return;
+    }
+    if (categories.some((c) => c.slug === cleanSlug)) {
+      showToast("Esta matéria já existe.", "error");
+      return;
+    }
+
+    const nextMeta = normalizeMeta({
+      ...meta,
+      categories: [...categories, { slug: cleanSlug, label: cleanLabel, idPrefix: cleanPrefix || cleanSlug.slice(0, 4) }],
+    });
+
+    // Cria arquivos vazios para todos os anos existentes
+    const emptyTemplate = Object.fromEntries(nextMeta.trimesters.map((t) => [t.key, []]));
+    const patch = {};
+    for (const year of years) {
+      const path = getDataFilePath(year, cleanSlug);
+      if (!fileState[path]) {
+        patch[path] = emptyTemplate;
+      }
+    }
+
+    const commitSha = await persistMetaAndFiles({
+      nextMeta,
+      nextFileStatePatch: patch,
+      commitMsg: `Add category ${cleanSlug}`,
+    });
+
+    if (commitSha) {
+      closeModal();
+      showToast("Matéria criada.");
+    }
+  }
+
+  async function handleRemoveCategory(slug) {
+    const cleanSlug = trim(slug);
+    if (!cleanSlug) return;
+    if (!categories.some((c) => c.slug === cleanSlug)) return;
+
+    const nextMeta = normalizeMeta({
+      ...meta,
+      categories: categories.filter((c) => c.slug !== cleanSlug),
+    });
+
+    const commitSha = await persistMetaAndFiles({
+      nextMeta,
+      nextFileStatePatch: {},
+      commitMsg: `Remove category ${cleanSlug}`,
+    });
+
+    if (commitSha) {
+      setCategoryToRemove(null);
+      closeModal();
+      showToast("Matéria removida.");
+    }
+  }
+
+  async function handleAddTrimester({ key, label }) {
+    const cleanKey = trim(key);
+    const cleanLabel = trim(label) || cleanKey;
+
+    if (!/^[0-9]+$/.test(cleanKey)) {
+      showToast("Trimestre inválido. Use apenas números (ex: 4).", "error");
+      return;
+    }
+    if (trimesters.some((t) => t.key === cleanKey)) {
+      showToast("Este trimestre já existe.", "error");
+      return;
+    }
+
+    const nextMeta = normalizeMeta({
+      ...meta,
+      trimesters: [...trimesters, { key: cleanKey, label: cleanLabel }],
+    });
+
+    const nextKeys = nextMeta.trimesters.map((t) => t.key);
+    const dataFiles = buildDataFiles(years, nextMeta.categories);
+    const patch = {};
+
+    for (const file of dataFiles) {
+      const path = file.path;
+      const current = fileState[path]?.data || {};
+      const normalized = normalizeTrimesterTemplate(current, nextKeys);
+      if (serializeCategoryFile(current) !== serializeCategoryFile(normalized)) {
+        patch[path] = normalized;
+      }
+    }
+
+    const commitSha = await persistMetaAndFiles({
+      nextMeta,
+      nextFileStatePatch: patch,
+      commitMsg: `Add trimester ${cleanKey}`,
+    });
+
+    if (commitSha) {
+      closeModal();
+      showToast("Trimestre criado.");
+    }
   }
 
   const filtered = projects.filter((project) => {
@@ -1733,7 +2079,7 @@ function Dashboard({ token, onLogout }) {
       />
 
       <header className="border-b border-stone-200 bg-white sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-8 py-4 flex items-center justify-between">
+        <div className="max-w-[1400px] mx-auto px-8 py-4 flex items-center justify-between">
           <div>
             <p className="text-xs tracking-[0.3em] uppercase text-stone-400">Painel Admin</p>
             <h1
@@ -1744,20 +2090,17 @@ function Dashboard({ token, onLogout }) {
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            <Btn small disabled={years.length === 0} onClick={openNewProjectForm}>
-              + Novo projeto
-            </Btn>
             <button
               type="button"
               onClick={() => setShowAuditLog(true)}
-              className="text-xs tracking-widest uppercase text-stone-400 hover:text-stone-700 transition-colors"
+              className="text-xs tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors"
             >
               Log
             </button>
             <button
               type="button"
               onClick={onLogout}
-              className="text-xs tracking-widest uppercase text-stone-400 hover:text-stone-700 transition-colors"
+              className="text-xs tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors"
             >
               Sair
             </button>
@@ -1765,87 +2108,28 @@ function Dashboard({ token, onLogout }) {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-8 py-10">
-        {/* Gerenciar anos */}
-        <div className="mb-8 pb-6 border-b border-stone-200">
-          <p className="text-xs tracking-widest uppercase text-stone-400 mb-3">Gerenciar anos</p>
-          <div className="flex flex-wrap items-center gap-3">
-            <input
-              type="text"
-              value={newYearInput}
-              onChange={(e) => setNewYearInput(e.target.value)}
-              placeholder="Ex: 2027"
-              className="bg-transparent border-b border-stone-300 py-1 text-sm text-stone-700 placeholder-stone-400 focus:outline-none focus:border-stone-900"
-            />
-            <Btn small onClick={handleCreateYear} disabled={saving || !newYearInput.trim()}>
-              + Adicionar ano
-            </Btn>
-            {years.map((year) => (
-              <button
-                key={year}
-                type="button"
-                onClick={() => setYearToDelete(year)}
-                className="text-xs tracking-wide border border-stone-300 px-3 py-1 text-stone-600 hover:text-red-600 hover:border-red-300 transition-colors"
-              >
-                Remover {year}
-              </button>
-            ))}
-          </div>
-        </div>
+      <main className="max-w-[1400px] mx-auto px-8 py-10">
+        <div className="flex items-end justify-between gap-6 mb-6">
+          <h2 className="text-lg font-light text-stone-900" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+            Trabalhos
+          </h2>
 
-        {/* Filtros */}
-        <div className="flex flex-wrap gap-4 mb-8 pb-6 border-b border-stone-200">
-          <div className="flex gap-2 items-center">
-            <span className="text-xs tracking-widest uppercase text-stone-400">Ano:</span>
-            <select
-              value={filterYear}
-              onChange={(e) => setFilterYear(e.target.value)}
-              className="bg-transparent border-b border-stone-300 py-1 text-sm text-stone-700 focus:outline-none focus:border-stone-900 pr-4"
+          <div className="text-right">
+            <p className="text-[10px] uppercase tracking-widest text-stone-400">
+              {filterYear === "all" ? "Ano: todos" : `Ano: ${filterYear}`}
+              {" · "}
+              {filterCat === "all" ? "Matéria: todas" : `Matéria: ${categoryLabelMap[filterCat] || filterCat}`}
+              {" · "}
+              {filterTri === "all" ? "Trimestre: todos" : `Trimestre: ${trimesterLabelMap[filterTri] || filterTri}`}
+            </p>
+            <button
+              type="button"
+              onClick={() => openModal("filters")}
+              className="mt-1 text-xs tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors"
             >
-              <option value="all">Todos</option>
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
+              Ajustar filtros ({filtered.length})
+            </button>
           </div>
-
-          <div className="flex gap-2 items-center">
-            <span className="text-xs tracking-widest uppercase text-stone-400">Categoria:</span>
-            <select
-              value={filterCat}
-              onChange={(e) => setFilterCat(e.target.value)}
-              className="bg-transparent border-b border-stone-300 py-1 text-sm text-stone-700 focus:outline-none focus:border-stone-900 pr-4"
-            >
-              <option value="all">Todas</option>
-              {CATEGORY_META.map((category) => (
-                <option key={category.slug} value={category.slug}>
-                  {category.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex gap-2 items-center">
-            <span className="text-xs tracking-widest uppercase text-stone-400">Trimestre:</span>
-            <select
-              value={filterTri}
-              onChange={(e) => setFilterTri(e.target.value)}
-              className="bg-transparent border-b border-stone-300 py-1 text-sm text-stone-700 focus:outline-none focus:border-stone-900 pr-4"
-            >
-              <option value="all">Todos</option>
-              {TRIMESTERS.map((trimester) => (
-                <option key={trimester} value={trimester}>
-                  {TRIMESTER_LABELS[trimester]}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <span className="ml-auto text-xs text-stone-400 self-center">
-            {filtered.length} resultado(s)
-          </span>
         </div>
 
         {/* Grid de projetos */}
@@ -1857,72 +2141,80 @@ function Dashboard({ token, onLogout }) {
             </Btn>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-stone-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filtered.map((project) => (
               <motion.div
                 key={project.id}
                 layout
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="bg-[#F5F3F0] p-6 flex flex-col gap-3"
+                className="bg-white shadow-sm hover:shadow-md transition-shadow flex flex-col p-6 h-full"
               >
                 {project.images?.[0] && (
-                  <div className="aspect-video mb-2">
+                  <div className="aspect-video mb-5 overflow-hidden bg-stone-100">
                     <ProjectImage
                       src={project.images[0]}
                       alt={project.title}
-                      className="w-full h-full"
+                      className="w-full h-full object-cover"
                       token={token}
                     />
                   </div>
                 )}
 
-                <div>
-                  <p className="text-xs tracking-[0.15em] uppercase text-stone-400 mb-1">
-                    {project.year} · {getCategoryLabel(project.categorySlug)} ·{" "}
-                    {TRIMESTER_LABELS[project.trimester] || project.trimester}
-                  </p>
+                <div className="flex-grow flex flex-col">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="bg-stone-100 text-stone-600 px-2 py-1 text-[10px] uppercase tracking-widest font-medium">
+                      {project.year}
+                    </span>
+                    <span className="text-[10px] tracking-widest uppercase text-stone-400">
+                      {categoryLabelMap[project.categorySlug] || project.categorySlug} · {trimesterLabelMap[project.trimester] || project.trimester}
+                    </span>
+                  </div>
+                  
                   <h3
-                    className="text-base font-light text-stone-900"
+                    className="text-xl font-light text-stone-900 leading-tight mb-2"
                     style={{ fontFamily: "'Cormorant Garamond', serif" }}
                   >
                     {project.title}
                   </h3>
+                  
                   {project.description && (
-                    <p className="text-xs text-stone-500 mt-1 line-clamp-2">
+                    <p className="text-sm text-stone-500 mb-4 line-clamp-3">
                       {project.description}
                     </p>
                   )}
+
+                  {project.skills?.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-auto mb-6">
+                      {project.skills.slice(0, 3).map((skill) => (
+                        <span
+                          key={skill}
+                          className="bg-stone-50 text-stone-600 px-2 py-1 text-[10px] uppercase tracking-widest"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                      {project.skills.length > 3 && (
+                        <span className="text-[10px] text-stone-400 self-center uppercase tracking-widest">
+                          +{project.skills.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                {project.skills?.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {project.skills.slice(0, 3).map((skill) => (
-                      <span
-                        key={skill}
-                        className="text-xs border border-stone-300 px-2 py-0.5 text-stone-500"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                    {project.skills.length > 3 && (
-                      <span className="text-xs text-stone-400">+{project.skills.length - 3}</span>
-                    )}
-                  </div>
-                )}
-
-                <div className="flex gap-3 mt-auto pt-3 border-t border-stone-200">
+                <div className="flex gap-4 pt-4 border-t border-stone-100 mt-auto">
                   <button
                     type="button"
                     onClick={() => setEditing({ ...project })}
-                    className="text-xs tracking-widest uppercase text-stone-500 hover:text-stone-900 transition-colors"
+                    className="text-[11px] font-medium tracking-widest uppercase text-stone-600 hover:text-stone-900 transition-colors"
                   >
                     Editar
                   </button>
                   <button
                     type="button"
                     onClick={() => setDeleteConfirm(project.id)}
-                    className="text-xs tracking-widest uppercase text-red-400 hover:text-red-600 transition-colors ml-auto"
+                    className="text-[11px] font-medium tracking-widest uppercase text-red-500 hover:text-red-700 transition-colors ml-auto"
                   >
                     Remover
                   </button>
@@ -1943,6 +2235,8 @@ function Dashboard({ token, onLogout }) {
             token={token}
             saving={saving}
             years={years}
+            categories={categories}
+            trimesters={trimesters}
           />
         )}
       </AnimatePresence>
@@ -1952,7 +2246,7 @@ function Dashboard({ token, onLogout }) {
         {deleteConfirm && (
           <ConfirmModal
             title="Remover projeto?"
-            description="Esta ação fará commits no repositório removendo o projeto do arquivo JSON correspondente."
+            description="Esta ação removerá o projeto do portfólio."
             confirmLabel="Confirmar"
             variant="danger"
             saving={saving}
@@ -1967,7 +2261,7 @@ function Dashboard({ token, onLogout }) {
         {yearToDelete && (
           <ConfirmModal
             title={`Remover ano ${yearToDelete}?`}
-            description="Todos os arquivos JSON deste ano serão removidos do repositório."
+            description="Esta ação removerá o ano e seus projetos."
             confirmLabel="Confirmar"
             variant="danger"
             saving={saving}
@@ -1987,17 +2281,318 @@ function Dashboard({ token, onLogout }) {
         {toast && <Toast msg={toast.msg} type={toast.type} />}
       </AnimatePresence>
 
-      {/* FAB */}
-      <button
-        type="button"
-        onClick={openNewProjectForm}
-        disabled={years.length === 0}
-        className="fixed bottom-6 right-6 z-40 w-12 h-12 bg-black text-white text-2xl leading-none flex items-center justify-center border border-black hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
-        aria-label="Adicionar projeto"
-        title="Adicionar projeto"
-      >
-        +
-      </button>
+      {/* MODALS */}
+      <AnimatePresence>
+        {activeModal === "filters" && (
+          <ModalShell
+            title="Filtros"
+            onClose={closeModal}
+            footer={
+              <div className="flex gap-3">
+                <Btn
+                  variant="ghost"
+                  onClick={() => {
+                    setFilterYear("all");
+                    setFilterCat("all");
+                    setFilterTri("all");
+                  }}
+                >
+                  Limpar
+                </Btn>
+                <Btn className="ml-auto" onClick={closeModal}>
+                  Aplicar
+                </Btn>
+              </div>
+            }
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="text-xs tracking-[0.15em] uppercase text-stone-500">Ano</label>
+                <select
+                  value={filterYear}
+                  onChange={(e) => setFilterYear(e.target.value)}
+                  className="mt-1 w-full bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:border-stone-900"
+                >
+                  <option value="all">Todos</option>
+                  {years.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs tracking-[0.15em] uppercase text-stone-500">Matéria</label>
+                <select
+                  value={filterCat}
+                  onChange={(e) => setFilterCat(e.target.value)}
+                  className="mt-1 w-full bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:border-stone-900"
+                >
+                  <option value="all">Todas</option>
+                  {categories.map((c) => (
+                    <option key={c.slug} value={c.slug}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs tracking-[0.15em] uppercase text-stone-500">Trimestre</label>
+                <select
+                  value={filterTri}
+                  onChange={(e) => setFilterTri(e.target.value)}
+                  className="mt-1 w-full bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:border-stone-900"
+                >
+                  <option value="all">Todos</option>
+                  {trimesters.map((t) => (
+                    <option key={t.key} value={t.key}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </ModalShell>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {activeModal === "years" && (
+          <ModalShell
+            title="Gerenciar anos"
+            onClose={closeModal}
+            footer={
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={newYearInput}
+                  onChange={(e) => setNewYearInput(e.target.value)}
+                  placeholder="Ex: 2027"
+                  className="w-28 bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900"
+                />
+                <Btn onClick={handleCreateYear} disabled={saving || !newYearInput.trim()}>
+                  Adicionar
+                </Btn>
+              </div>
+            }
+          >
+            <div className="flex flex-wrap gap-2">
+              {years.map((year) => (
+                <button
+                  key={year}
+                  type="button"
+                  onClick={() => setYearToDelete(year)}
+                  className="text-xs tracking-widest bg-stone-100 hover:bg-red-50 hover:text-red-700 text-stone-700 px-3 py-2 transition-colors uppercase font-medium"
+                  title={`Remover ano ${year}`}
+                >
+                  &times; {year}
+                </button>
+              ))}
+              {years.length === 0 && <p className="text-sm text-stone-400">Nenhum ano cadastrado.</p>}
+            </div>
+          </ModalShell>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {activeModal === "categories" && (
+          <ModalShell
+            title="Matérias"
+            onClose={closeModal}
+            footer={
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input
+                  type="text"
+                  value={newCategoryLabel}
+                  onChange={(e) => setNewCategoryLabel(e.target.value)}
+                  placeholder="Nome"
+                  className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900"
+                />
+                <input
+                  type="text"
+                  value={newCategorySlug}
+                  onChange={(e) => setNewCategorySlug(e.target.value)}
+                  placeholder="slug (ex: biologia)"
+                  className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900"
+                />
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={newCategoryPrefix}
+                    onChange={(e) => setNewCategoryPrefix(e.target.value)}
+                    placeholder="prefix"
+                    className="w-24 bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900"
+                  />
+                  <Btn
+                    className="ml-auto"
+                    onClick={() =>
+                      handleAddCategory({
+                        slug: newCategorySlug,
+                        label: newCategoryLabel,
+                        idPrefix: newCategoryPrefix,
+                      })
+                    }
+                    disabled={saving}
+                  >
+                    Criar
+                  </Btn>
+                </div>
+              </div>
+            }
+          >
+            <div className="space-y-2">
+              {categories.map((c) => (
+                <div key={c.slug} className="flex items-center justify-between gap-4 bg-stone-50 border border-stone-100 px-4 py-3">
+                  <div>
+                    <p className="text-sm text-stone-900 font-medium">{c.label}</p>
+                    <p className="text-xs text-stone-500 font-mono">{c.slug}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setCategoryToRemove(c.slug)}
+                    className="text-xs tracking-widest uppercase text-red-500 hover:text-red-700 transition-colors"
+                  >
+                    Remover
+                  </button>
+                </div>
+              ))}
+              {categories.length === 0 && <p className="text-sm text-stone-400">Nenhuma matéria cadastrada.</p>}
+            </div>
+          </ModalShell>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {activeModal === "trimesters" && (
+          <ModalShell
+            title="Trimestres"
+            onClose={closeModal}
+            footer={
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input
+                  type="text"
+                  value={newTrimesterKey}
+                  onChange={(e) => setNewTrimesterKey(e.target.value)}
+                  placeholder="Número (ex: 4)"
+                  className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900"
+                />
+                <input
+                  type="text"
+                  value={newTrimesterLabel}
+                  onChange={(e) => setNewTrimesterLabel(e.target.value)}
+                  placeholder="Label (ex: 4º Trimestre)"
+                  className="bg-stone-50 border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-900"
+                />
+                <Btn
+                  onClick={() => handleAddTrimester({ key: newTrimesterKey, label: newTrimesterLabel })}
+                  disabled={saving}
+                >
+                  Criar
+                </Btn>
+              </div>
+            }
+          >
+            <div className="space-y-2">
+              {trimesters.map((t) => (
+                <div key={t.key} className="flex items-center justify-between gap-4 bg-stone-50 border border-stone-100 px-4 py-3">
+                  <div>
+                    <p className="text-sm text-stone-900 font-medium">{t.label}</p>
+                    <p className="text-xs text-stone-500 font-mono">{t.key}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ModalShell>
+        )}
+      </AnimatePresence>
+
+      {/* Confirm remove category */}
+      <AnimatePresence>
+        {categoryToRemove && (
+          <ConfirmModal
+            title="Remover matéria?"
+            description="Esta ação remove a matéria do menu. Os dados existentes não são apagados."
+            confirmLabel="Remover"
+            variant="danger"
+            saving={saving}
+            onConfirm={() => handleRemoveCategory(categoryToRemove)}
+            onCancel={() => setCategoryToRemove(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* FAB MENU */}
+      <AnimatePresence>
+        {fabOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[2px]"
+            onClick={closeFab}
+          />
+        )}
+      </AnimatePresence>
+
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <AnimatePresence>
+          {fabOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 12, scale: 0.98, transformOrigin: "bottom right" }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.98 }}
+              transition={{ duration: 0.16, ease: "easeOut" }}
+              className="mb-3 w-64 bg-white border border-stone-200 shadow-2xl"
+            >
+              <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-stone-400">
+                Ações
+              </div>
+              <div className="py-1">
+                <FabActionButton
+                  marker="P"
+                  label="Novo projeto"
+                  onClick={() => {
+                    closeFab();
+                    openNewProjectForm();
+                  }}
+                />
+                <FabActionButton marker="A" label="Gerenciar anos" onClick={() => openModal("years")} />
+                <FabActionButton marker="T" label="Gerenciar trimestres" onClick={() => openModal("trimesters")} />
+                <FabActionButton marker="M" label="Matérias" onClick={() => openModal("categories")} />
+              </div>
+              <div className="h-px bg-stone-100" />
+              <div className="py-1">
+                <FabActionButton marker="F" label="Filtros" subdued onClick={() => openModal("filters")} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <button
+          type="button"
+          onClick={() => setFabOpen((v) => !v)}
+          className="h-14 w-14 bg-stone-900 text-white shadow-xl border border-stone-900 hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-900 focus:ring-offset-2"
+          aria-label="Menu de ações"
+          title="Ações"
+        >
+          <motion.svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="mx-auto"
+            animate={{ rotate: fabOpen ? 45 : 0 }}
+            transition={{ duration: 0.15, ease: "easeInOut" }}
+          >
+            <path d="M12 4V20" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
+            <path d="M4 12H20" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
+          </motion.svg>
+        </button>
+      </div>
     </div>
   );
 }

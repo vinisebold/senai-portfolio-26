@@ -1,0 +1,13 @@
+{
+  "categories": [
+    { "slug": "ciencias-humanas", "label": "Ciências Humanas", "idPrefix": "ch" },
+    { "slug": "ciencias-natureza", "label": "Ciências Natureza", "idPrefix": "cn" },
+    { "slug": "linguagens", "label": "Linguagens", "idPrefix": "ling" },
+    { "slug": "matematica", "label": "Matemática", "idPrefix": "mat" }
+  ],
+  "trimesters": [
+    { "key": "1", "label": "1º Trimestre" },
+    { "key": "2", "label": "2º Trimestre" },
+    { "key": "3", "label": "3º Trimestre" }
+  ]
+}

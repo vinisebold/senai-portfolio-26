@@ -1,6 +1,6 @@
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { getCategoryBySlug, getTrimester, isValidYear } from '../data/portfolio';
+import { getCategoryBySlug, getTrimester, getTrimestersMeta, isValidYear } from '../data/portfolio';
 import PageHeader from '../components/PageHeader';
 import Card from '../components/Card';
 
@@ -18,13 +18,20 @@ import Card from '../components/Card';
 
 const TrimesterPage = () => {
   const { year, categorySlug, trimesterNumber } = useParams();
+  const trimestersMeta = getTrimestersMeta();
 
   if (!isValidYear(year)) {
     return <Navigate to="/" replace />;
   }
 
   // Parse trimester number from URL (format: "1", "2", "3")
-  const numero = parseInt(trimesterNumber);
+  const numero = Number.parseInt(trimesterNumber, 10);
+
+  const formatTrimesterNumber = (key) => {
+    const parsed = Number.parseInt(key, 10);
+    if (Number.isNaN(parsed)) return String(key);
+    return String(parsed).padStart(2, '0');
+  };
 
   // Fetch data
   const category = getCategoryBySlug(year, categorySlug);
@@ -43,17 +50,24 @@ const TrimesterPage = () => {
       {/* Left sidebar - Trimester navigation (no animation) */}
       <aside className="fixed left-6 md:left-8 top-16 md:top-48 z-10">
         <div className="flex flex-row md:flex-col gap-6 md:gap-2">
-          {[1, 2, 3].map((num) => (
+          {trimestersMeta.map(({ key }) => {
+            const trimesterAsNumber = Number.parseInt(key, 10);
+            const isActive = !Number.isNaN(trimesterAsNumber)
+              ? numero === trimesterAsNumber
+              : trimesterNumber === key;
+
+            return (
             <Link
-              key={num}
-              to={`/${year}/${categorySlug}/${num}`}
+              key={key}
+              to={`/${year}/${categorySlug}/${key}`}
               className={`font-roboto text-[13px] uppercase opacity-90 hover:opacity-100 transition-opacity block ${
-                numero === num ? 'font-medium opacity-100' : 'font-light'
+                isActive ? 'font-medium opacity-100' : 'font-light'
               }`}
             >
-              |0{num}| TRIMESTRE
+              |{formatTrimesterNumber(key)}| TRIMESTRE
             </Link>
-          ))}
+            );
+          })}
         </div>
       </aside>
 

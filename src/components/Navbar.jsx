@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getCategories } from '../data/portfolio';
+import { getCategories, getTrimestersMeta } from '../data/portfolio';
 import YearSwitch from './YearSwitch';
 
 /**
@@ -22,6 +22,13 @@ const Navbar = () => {
   const [_, yearFromPath] = location.pathname.split('/');
   const activeYear = yearFromPath || '2025';
   const categories = getCategories(activeYear);
+  const trimestersMeta = getTrimestersMeta();
+
+  const formatTrimesterNumber = (key) => {
+    const parsed = Number.parseInt(key, 10);
+    if (Number.isNaN(parsed)) return String(key);
+    return String(parsed).padStart(2, '0');
+  };
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -162,16 +169,16 @@ const Navbar = () => {
                           transition={{ duration: 0.4, ease: [0.43, 0.13, 0.23, 0.96] }}
                           className="space-y-5 pt-1 flex-shrink-0"
                         >
-                          {[1, 2, 3].map((num) => (
-                            <div key={num}>
+                          {trimestersMeta.map(({ key }) => (
+                            <div key={key}>
                               <Link
-                                to={`/${activeYear}/${cat.slug}/${num}`}
+                                to={`/${activeYear}/${cat.slug}/${key}`}
                                 className={`font-roboto text-[15px] uppercase opacity-90 hover:opacity-100 transition-opacity block ${
-                                  location.pathname === `/${activeYear}/${cat.slug}/${num}` ? 'font-medium' : 'font-light'
+                                  location.pathname === `/${activeYear}/${cat.slug}/${key}` ? 'font-medium' : 'font-light'
                                 }`}
                                 onClick={closeMenu}
                               >
-                                |0{num}| TRIMESTRE
+                                |{formatTrimesterNumber(key)}| TRIMESTRE
                               </Link>
                             </div>
                           ))}
