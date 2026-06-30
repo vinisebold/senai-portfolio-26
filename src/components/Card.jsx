@@ -12,13 +12,13 @@ import Carousel from './Carousel';
  * - Typography: Cormorant for tema, Inter for labels
  */
 
-const Card = ({ trabalho }) => {
+const Card = ({ trabalho, onFocusModeChange }) => {
   const { tema, habilidades, descricao, imagens } = trabalho;
 
   return (
     <article className="w-full">
       {/* Image carousel section */}
-      <Carousel images={imagens} />
+      <Carousel images={imagens} onFocusModeChange={onFocusModeChange} />
 
       {/* Content section */}
       <div className="pt-card-gap pb-card-margin">

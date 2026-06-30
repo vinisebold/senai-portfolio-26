@@ -1,4 +1,5 @@
 import { useParams, Navigate, Link } from 'react-router-dom';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { getCategoryBySlug, getTrimester, getTrimestersMeta, isValidYear } from '../data/portfolio';
 import PageHeader from '../components/PageHeader';
@@ -19,6 +20,8 @@ import Card from '../components/Card';
 const TrimesterPage = () => {
   const { year, categorySlug, trimesterNumber } = useParams();
   const trimestersMeta = getTrimestersMeta();
+  const [isFocusMode, setIsFocusMode] = useState(false);
+  const focusTransition = { duration: 0.55, ease: [0.43, 0.13, 0.23, 0.96] };
 
   if (!isValidYear(year)) {
     return <Navigate to="/" replace />;
@@ -45,10 +48,19 @@ const TrimesterPage = () => {
   return (
     <>
       {/* White background bar for mobile/tablet (behind hamburger and sidebar) */}
-      <div className="fixed top-0 left-0 right-0 h-28 bg-white md:bg-transparent z-[5]" />
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-28 bg-white md:bg-transparent z-[5]"
+        animate={isFocusMode ? { opacity: 0 } : { opacity: 1 }}
+        transition={focusTransition}
+      />
 
       {/* Left sidebar - Trimester navigation (no animation) */}
-      <aside className="fixed left-6 md:left-8 top-16 md:top-48 z-10">
+      <motion.aside
+        className="fixed left-6 md:left-8 top-16 md:top-48 z-10"
+        animate={isFocusMode ? { opacity: 0, x: -72 } : { opacity: 1, x: 0 }}
+        transition={focusTransition}
+        style={{ pointerEvents: isFocusMode ? 'none' : 'auto' }}
+      >
         <div className="flex flex-row md:flex-col gap-6 md:gap-2">
           {trimestersMeta.map(({ key }) => {
             const trimesterAsNumber = Number.parseInt(key, 10);
@@ -69,19 +81,27 @@ const TrimesterPage = () => {
             );
           })}
         </div>
-      </aside>
+      </motion.aside>
 
       {/* Page header (no animation) */}
-      <div className="pt-14">
+      <motion.div
+        className="pt-14"
+        animate={isFocusMode ? { opacity: 0 } : { opacity: 1 }}
+        transition={focusTransition}
+        style={{ pointerEvents: isFocusMode ? 'none' : 'auto' }}
+      >
         <PageHeader numero={numero} categoria={category.categoria} />
-      </div>
+      </motion.div>
 
       {/* Main content with animation */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        animate={isFocusMode
+          ? { opacity: 0, y: 0 }
+          : { opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.2 }}
+        transition={isFocusMode ? focusTransition : { duration: 0.24 }}
+        style={{ pointerEvents: isFocusMode ? 'none' : 'auto' }}
       >
         {/* Work cards section */}
         <section className="px-20 md:px-40 lg:px-64 pb-24">
@@ -96,7 +116,11 @@ const TrimesterPage = () => {
             ) : (
               // Render work cards
               trimester.trabalhos.map((trabalho) => (
-                <Card key={trabalho.id} trabalho={trabalho} />
+                <Card
+                  key={trabalho.id}
+                  trabalho={trabalho}
+                  onFocusModeChange={setIsFocusMode}
+                />
               ))
             )}
           </div>

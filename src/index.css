@@ -8,13 +8,18 @@
     @apply border-black;
   }
 
+  html {
+    scrollbar-gutter: stable;
+  }
+
   body {
     @apply font-inter font-light text-black bg-white antialiased;
     letter-spacing: 0.06em;
   }
 
-  /* Prevent scroll when menu is open */
-  body.menu-open {
+  /* Prevent scroll when an overlay is open */
+  body.menu-open,
+  body.focus-open {
     overflow: hidden;
   }
 
