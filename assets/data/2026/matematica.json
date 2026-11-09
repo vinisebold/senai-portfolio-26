@@ -48,5 +48,19 @@
       ]
     }
   ],
-  "3": []
+  "3": [
+    {
+      "id": "ch-1794228144334",
+      "tema": "Mapas Mentais: Matrizes, Determinantes e Sistemas Lineares",
+      "descricao": "Mapas Mentais: Matrizes, Determinantes e Sistemas Lineares\nObjetivo da atividade\nOrganizar e sintetizar os principais conceitos estudados sobre Matrizes, Determinantes e Sistemas Lineares, utilizando mapas mentais como estratégia de revisão e sistematização da aprendizagem.\nProposta:Você deverá produzir 3 mapas mentais, um para cada tema:\nMatrizes\nDeterminantes\nSistemas Lineares\n\nOs mapas mentais deverão ser elaborados à mão, utilizando folha de papel, caderno ou folha sulfite. Após a produção, você deverá tirar uma foto com boa qualidade de cada mapa e inserir as imagens no seu portfólio.\n\nOrientações para a construção dos mapas mentais: Os mapas devem apresentar os principais conceitos, definições, propriedades, classificações e procedimentos relacionados a cada conteúdo.\n\n🟦 Mapa Mental 1 – Matrizes\n\nO mapa deverá contemplar, entre outros tópicos:\n\nConceito e representação de uma matriz; Elementos de uma matriz; Linhas e colunas; Ordem de uma matriz; Representação dos elementos (a_{ij}); Tipos de matrizes: matriz linha; matriz coluna; matriz quadrada; matriz nula; matriz identidade; matriz diagonal; matriz triangular; Igualdade de matrizes; Operações com matrizes: adição; subtração; multiplicação por escalar; multiplicação de matrizes.\n🟩 Mapa Mental 2 – Determinantes\n\nO mapa deverá contemplar, entre outros tópicos: Conceito de determinante; Determinante de matriz (2 \\times 2);\nDeterminante de matriz (3 \\times 3); Regra de Sarrus; Propriedades dos determinantes; Relação entre determinante e matriz; Determinante igual a zero; Matriz singular e não singular; Aplicações dos determinantes; Relação entre determinantes e sistemas lineares.\n🟨 Mapa Mental 3 – Sistemas Lineares\n\nO mapa deverá contemplar, entre outros tópicos: Conceito de sistema linear; Equações lineares; Incógnitas e coeficientes; Classificação dos sistemas: SPD – Sistema Possível e Determinado; SPI – Sistema Possível e Indeterminado; SI – Sistema Impossível; Representação matricial de um sistema; Matriz dos coeficientes;\nMatriz ampliada; Métodos de resolução: substituição; adição; Regra de Cramer;\nInterpretação geométrica das soluções; Relação entre sistemas lineares, matrizes e determinantes.                       Como fazer um bom mapa mental?\n\nCada mapa deve apresentar:\nTema principal em destaque;\nRamificações organizadas por tópicos;\nPalavras-chave e conceitos importantes;\nFórmulas essenciais;\nExemplos curtos, quando necessário;\nSetas, símbolos, caixas ou outros elementos que auxiliem na organização;\nOrganização visual que facilite a revisão do conteúdo.\n\nImportante: não é necessário copiar textos longos. O objetivo é selecionar, organizar e sintetizar as informações mais importantes de cada conteúdo.\n\nForma de entrega\nProduzir os 3 mapas mentais à mão;\nFotografar cada mapa individualmente, garantindo que a imagem esteja nítida, completa e legível;\nInserir as três fotos no portfólio;\nIdentificar cada mapa com o respectivo tema:\nMapa Mental – Matrizes;\nMapa Mental – Determinantes;\nMapa Mental – Sistemas Lineares.\nEvidência de aprendizagem\n\nA atividade deverá demonstrar a capacidade de identificar, selecionar, relacionar e organizar os principais conceitos de Matrizes, Determinantes e Sistemas Lineares, utilizando uma representação visual para sistematizar os conhecimentos estudados.",
+      "habilidades": [
+        "H4 - Representar e operar com números complexos em suas formas algébrica, geométrica e trigonométrica para resolver problemas em múltiplos contextos."
+      ],
+      "imagens": [
+        "assets/images/2026/3/matematica/uploads/ch-1794228144334_1794228253918.jpeg",
+        "assets/images/2026/3/matematica/uploads/ch-1794228144334_1794228264053.jpeg",
+        "assets/images/2026/3/matematica/uploads/ch-1794228144334_1794228270612.jpeg"
+      ]
+    }
+  ]
 }
