@@ -55,5 +55,18 @@
       ]
     }
   ],
-  "3": []
+  "3": [
+    {
+      "id": "ch-1794798234216",
+      "tema": "Árvore genealógica",
+      "descricao": "Construir o HEREDOGRAMA de sua família, ressaltando alguma característica genética.Na montagem deferá conter sobrenome dos avós, identificar você, legenda e carcaterística genética.",
+      "habilidades": [
+        "H3 - Inferir significado de termos técnico-científicos em textos de instrumentação ou de divulgação científica."
+      ],
+      "imagens": [
+        "assets/images/2026/3/ciencias-natureza/uploads/ch-1794798234216_1794798329584.jpg",
+        "assets/images/2026/3/ciencias-natureza/uploads/ch-1794798234216_1794798337945.jpg"
+      ]
+    }
+  ]
 }
